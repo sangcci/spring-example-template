@@ -26,12 +26,6 @@ public class HttpLoggingFilter extends OncePerRequestFilter {
     private static final Pattern VALID_REQUEST_ID = Pattern.compile("[A-Za-z0-9._:-]{1,128}");
 
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) {
-        String uri = request.getRequestURI();
-        return uri.equals("/actuator/health") || uri.startsWith("/actuator/health/");
-    }
-
-    @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         String requestId = request.getHeader(REQUEST_ID_HEADER);
@@ -45,13 +39,17 @@ public class HttpLoggingFilter extends OncePerRequestFilter {
             try {
                 filterChain.doFilter(request, response);
             } finally {
-                long durationMillis = (System.nanoTime() - startedAt) / 1_000_000;
-                log.info(
-                        "http_request method={} uri={} status={} durationMs={}",
-                        request.getMethod(),
-                        request.getRequestURI(),
-                        response.getStatus(),
-                        durationMillis);
+                String uri = request.getRequestURI();
+                boolean shouldLog = !uri.equals("/actuator") && !uri.startsWith("/actuator/");
+                if (shouldLog) {
+                    long durationMillis = (System.nanoTime() - startedAt) / 1_000_000;
+                    log.info(
+                            "http_request method={} uri={} status={} durationMs={}",
+                            request.getMethod(),
+                            uri,
+                            response.getStatus(),
+                            durationMillis);
+                }
             }
         }
     }
