@@ -20,3 +20,11 @@ management:
 
 server:
   shutdown: graceful
+
+security:
+  jwt:
+    secret-base64: ${JWT_SECRET_BASE64}
+    issuer: spring-example-template
+    audience: spring-example-template-api
+    access-token-cookie-name: access-token
+    allowed-clock-skew: 30s

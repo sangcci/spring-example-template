@@ -316,6 +316,9 @@ OIDC 검증 세부 사항은 `infra/security` 또는 `infra/client`에 둔다. u
 
 ```text
 com.example.lab
+├── auth                         # 인증·인가 context
+│   └── infra
+│       └── security             # JWT, Spring Security와 browser 보안 구현
 ├── <context>
 │   ├── presentation            # web, message, scheduler 진입점
 │   ├── usecase                 # 처음에는 평평하게 유지
@@ -343,7 +346,9 @@ com.example.lab
 
 policy에는 `PostPolicy`처럼 context 전체를 포괄하는 이름보다 `PostPublicationPolicy`, `OrderCancellationPolicy`처럼 구체적인 business concept의 이름을 붙인다. 새로운 policy와 package 이름은 AI agent가 독자적으로 확정하지 않고 의미, owner, 사용처와 대안을 먼저 제시한다.
 
-`global`은 중복 코드를 임시로 옮기는 장소가 아니다. 특정 context가 소유하지 않는 HTTP 응답, 공통 오류 계약과 요청 로깅처럼 애플리케이션 전체에 같은 의미로 적용되는 기술 관심사만 둔다.
+`global`은 중복 코드를 임시로 옮기는 장소가 아니다. 특정 context가 소유하지 않는 HTTP 응답, 공통 오류 계약과 요청 로깅처럼 애플리케이션 전체에 같은 의미로 적용되는 기술 관심사만 둔다. business rule, use case, domain policy와 특정 context가 의미를 정하는 오류는 `global`에 두지 않는다.
+
+인증·인가의 owner는 `auth` context다. 요청 앞단에서 모든 context에 적용되더라도 JWT claim, 인증 주체, 권한과 refresh session의 의미는 `auth`가 정한다. Spring Security filter와 token 검증 같은 protocol 구현은 `auth/infra/security`에 두며, 공통 응답 계약을 사용하기 위한 `auth -> global` 의존만 허용한다. `global`은 `auth`를 알지 않는다.
 
 ## 15. 테스트 전략
 
