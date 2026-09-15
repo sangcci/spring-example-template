@@ -55,4 +55,4 @@ cookie가 browser 요청에 자동으로 포함되므로 CSRF protection을 활�
 
 ## 7. 기본 접근 정책
 
-명시적으로 공개한 endpoint만 anonymous 접근을 허용하고 나머지는 인증을 요구한다. health endpoint는 공개하지만 Prometheus endpoint는 기본적으로 보호한다. 로그인과 refresh endpoint는 해당 use case를 구현할 때 공개 목록에 추가한다.
+명시적으로 공개한 endpoint만 anonymous 접근을 허용하고 나머지는 인증을 요구한다. health endpoint와 API 문서 endpoint는 공개하지만 Prometheus endpoint는 기본적으로 보호한다. 로그인과 refresh endpoint는 해당 use case를 구현할 때 공개 목록에 추가한다.

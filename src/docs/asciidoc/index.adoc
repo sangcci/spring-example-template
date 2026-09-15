@@ -1,0 +1,10 @@
+= Spring Example Template API
+:toc: left
+:toclevels: 2
+:sectlinks:
+
+== 문서 구성
+
+이 문서는 Spring REST Docs 테스트를 통과한 API의 요청과 응답을 설명한다.
+
+대화형 API 문서는 `/swagger-ui/index.html`에서 확인한다.

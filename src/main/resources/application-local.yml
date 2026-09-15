@@ -1,6 +1,9 @@
 spring:
   application:
     name: spring-example-template
+  config:
+    activate:
+      on-profile: local
 
 management:
   endpoints:

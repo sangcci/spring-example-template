@@ -58,7 +58,12 @@ public class SecurityConfig {
                 .httpBasic(httpBasic -> httpBasic.disable())
                 .logout(logout -> logout.disable())
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/actuator/health", "/actuator/health/**")
+                        .requestMatchers(
+                                "/actuator/health",
+                                "/actuator/health/**",
+                                "/docs/**",
+                                "/swagger-ui/**",
+                                "/webjars/swagger-ui/**")
                         .permitAll()
                         .anyRequest()
                         .authenticated())

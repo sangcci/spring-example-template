@@ -40,7 +40,25 @@ private method 추출은 다음 조건을 모두 만족할 때만 검토한다.
 
 조건이 명확하지 않으면 메서드 안에 유지한다. 여러 줄이라는 이유나 미래에 재사용할 수 있다는 추측만으로 추출하지 않는다.
 
-## 5. 검토 기준
+## 5. 메서드 인자
+
+메서드 인자 내부에서 계산하거나 다른 메서드와 생성자를 호출하지 않는다. 전달할 결과를 의미가 드러나는 지역 변수로 먼저 추출한 뒤 인자로 사용한다.
+
+```java
+Instant expiresAt = clock.instant().plus(accessTokenTtl);
+AccessToken accessToken = new AccessToken(tokenValue, expiresAt);
+tokenStore.save(accountId, accessToken);
+```
+
+다음처럼 호출과 계산을 인자 안에 중첩하지 않는다.
+
+```java
+tokenStore.save(account.getId(), new AccessToken(tokenValue, clock.instant().plus(accessTokenTtl)));
+```
+
+단순 literal, 상수와 이미 준비된 변수는 그대로 전달할 수 있다. 지역 변수의 이름은 계산 방법이 아니라 호출받는 값의 의미를 설명해야 한다.
+
+## 6. 검토 기준
 
 - 조건과 실패 지점을 호출 메서드에서 바로 확인할 수 있는가?
 - 상수나 helper 이름을 따라가야만 실제 값을 알 수 있지는 않은가?

@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Spring Example Template API</title>
+  <link rel="stylesheet" href="/webjars/swagger-ui/5.32.2/swagger-ui.css">
+</head>
+<body>
+<div id="swagger-ui"></div>
+<script src="/webjars/swagger-ui/5.32.2/swagger-ui-bundle.js"></script>
+<script src="/webjars/swagger-ui/5.32.2/swagger-ui-standalone-preset.js"></script>
+<script>
+  function readCsrfToken() {
+    const cookiePrefix = "XSRF-TOKEN=";
+    const cookies = document.cookie.split("; ");
+    for (const cookie of cookies) {
+      if (cookie.startsWith(cookiePrefix)) {
+        const encodedToken = cookie.substring(cookiePrefix.length);
+        return decodeURIComponent(encodedToken);
+      }
+    }
+    return null;
+  }
+
+  window.onload = function () {
+    SwaggerUIBundle({
+      url: "/docs/openapi3.yaml",
+      dom_id: "#swagger-ui",
+      deepLinking: true,
+      withCredentials: true,
+      requestInterceptor: function (request) {
+        const csrfToken = readCsrfToken();
+        if (csrfToken !== null) {
+          request.headers["X-XSRF-TOKEN"] = csrfToken;
+        }
+        return request;
+      },
+      presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
+      layout: "StandaloneLayout"
+    });
+  };
+</script>
+</body>
+</html>

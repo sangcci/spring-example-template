@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: spring-example-template
+  config:
+    activate:
+      on-profile: test
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - prometheus
+  endpoint:
+    health:
+      show-details: never
+      probes:
+        enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+server:
+  shutdown: graceful
+
+security:
+  jwt:
+    secret-base64: MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=
+    issuer: spring-example-template
+    audience: spring-example-template-api
+    access-token-cookie-name: access-token
+    allowed-clock-skew: 30s

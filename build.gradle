@@ -2,6 +2,8 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '4.1.1'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'org.asciidoctor.jvm.convert' version '4.0.5'
+	id 'com.epages.restdocs-api-spec' version '0.20.1'
 	id 'com.diffplug.spotless' version '8.10.0' apply false
 }
 
@@ -15,6 +17,9 @@ java {
 }
 
 apply from: 'lint.gradle'
+
+def snippetsDirectory = layout.buildDirectory.dir('generated-snippets')
+def apiDocumentsDirectory = layout.buildDirectory.dir('generated-api-docs')
 
 repositories {
 	mavenCentral()
@@ -34,4 +39,65 @@ dependencies {
 
 	// Micrometer
 	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+
+	// Swagger UI
+	runtimeOnly 'org.webjars:swagger-ui:5.32.2'
+
+	// Spring Boot Test and REST Docs
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.boot:spring-boot-starter-restdocs'
+	testImplementation 'com.epages:restdocs-api-spec-mockmvc:0.20.1'
+
+	// Instancio
+	testImplementation 'org.instancio:instancio-junit:6.0.0'
+
+	// Testcontainers
+	testImplementation 'org.testcontainers:testcontainers-junit-jupiter:2.0.5'
+}
+
+tasks.named('bootRun') {
+	dependsOn 'copyApiDocs'
+	classpath += files(apiDocumentsDirectory)
+	systemProperty 'spring.profiles.active', 'local'
+}
+
+tasks.named('test') {
+	systemProperty 'spring.profiles.active', 'test'
+	outputs.dir snippetsDirectory
+}
+
+tasks.named('asciidoctor') {
+	dependsOn tasks.named('test')
+	attributes 'snippets': snippetsDirectory.get().asFile
+}
+
+openapi3 {
+	server = 'http://localhost:8080'
+	title = 'Spring Example Template API'
+	description = 'Spring Example Template API documentation'
+	version = project.version
+	format = 'yaml'
+}
+
+tasks.configureEach {
+	if (name == 'openapi3') {
+		dependsOn tasks.named('test')
+	}
+}
+
+tasks.register('copyApiDocs', Copy) {
+	dependsOn tasks.named('asciidoctor')
+	dependsOn 'openapi3'
+
+	from(layout.buildDirectory.dir('docs/asciidoc')) {
+		include 'index.html'
+	}
+	from(layout.buildDirectory.dir('api-spec')) {
+		include 'openapi3.yaml'
+	}
+	into apiDocumentsDirectory.map { it.dir('static/docs') }
+}
+
+tasks.named('bootJar') {
+	dependsOn tasks.named('copyApiDocs')
 }
