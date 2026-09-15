@@ -316,19 +316,21 @@ OIDC 검증 세부 사항은 `infra/security` 또는 `infra/client`에 둔다. u
 
 ```text
 com.example.lab
-├── auth                         # 인증·인가 context
-│   └── infra
-│       └── security             # JWT, Spring Security와 browser 보안 구현
-├── <context>
-│   ├── presentation            # web, message, scheduler 진입점
-│   ├── usecase                 # 처음에는 평평하게 유지
-│   ├── domain                  # 빈 구조로 제공하고 필요할 때 사용
-│   └── infra
-│       ├── persistence         # concrete jOOQ Mapper
-│       ├── client              # 외부 HTTP/SDK 구현
-│       ├── messaging
-│       └── security
-└── global                      # context에 속하지 않는 공통 기술 계약과 구현
+├── module                       # bounded context를 묶는 단일 애플리케이션 영역
+│   ├── auth
+│   │   └── infra
+│   │       └── security         # JWT, Spring Security와 browser 보안 구현
+│   └── <context>
+│       ├── presentation         # web, message, scheduler 진입점
+│       ├── usecase              # 처음에는 평평하게 유지
+│       ├── domain               # 빈 구조로 제공하고 필요할 때 사용
+│       └── infra
+│           ├── persistence      # concrete jOOQ Mapper
+│           ├── client           # context가 소유하는 외부 연동 adapter
+│           ├── messaging
+│           └── security
+├── external                     # 외부 시스템의 기술 client와 provider 계약
+└── global                       # context에 속하지 않는 공통 기술 계약과 구현
 ```
 
 빈 package는 사용 가능한 구조와 확장 방향을 보여주기 위해 template에 제공한다. 비어 있다는 이유로 class나 interface를 채우지 않는다. 각 context의 내부 layout은 복잡성의 출처에 따라 달라질 수 있으며, 모든 context에 같은 전술 패턴을 강제하지 않는다.
@@ -342,13 +344,26 @@ com.example.lab
 | Data Consistency | SQL, Constraint, Transaction |
 | Orchestration | Use Case, Workflow |
 
-`presentation`에는 controller, request/response, message listener와 scheduler처럼 들어오는 protocol을 처리하는 type을 둔다. Entity, Value Object, Domain Service와 Domain Policy는 `domain`에 둔다. use case의 입력·출력과 orchestration 전용 type은 `usecase`에 둔다. `infra`에는 jOOQ, 외부 HTTP/SDK, messaging, security의 구체적인 기술 구현을 둔다.
+`module`은 단일 Gradle module 안의 bounded context를 한곳에서 식별하기 위한 package다. Gradle multi-module을 의미하지 않는다. `presentation`에는 controller, request/response, message listener와 scheduler처럼 들어오는 protocol을 처리하는 type을 둔다. Entity, Value Object, Domain Service와 Domain Policy는 `domain`에 둔다. use case의 입력·출력과 orchestration 전용 type은 `usecase`에 둔다. `infra`에는 jOOQ, context가 소유하는 외부 연동 adapter, messaging과 security의 구체적인 기술 구현을 둔다.
 
 policy에는 `PostPolicy`처럼 context 전체를 포괄하는 이름보다 `PostPublicationPolicy`, `OrderCancellationPolicy`처럼 구체적인 business concept의 이름을 붙인다. 새로운 policy와 package 이름은 AI agent가 독자적으로 확정하지 않고 의미, owner, 사용처와 대안을 먼저 제시한다.
 
 `global`은 중복 코드를 임시로 옮기는 장소가 아니다. 특정 context가 소유하지 않는 HTTP 응답, 공통 오류 계약과 요청 로깅처럼 애플리케이션 전체에 같은 의미로 적용되는 기술 관심사만 둔다. business rule, use case, domain policy와 특정 context가 의미를 정하는 오류는 `global`에 두지 않는다.
 
-인증·인가의 owner는 `auth` context다. 요청 앞단에서 모든 context에 적용되더라도 JWT claim, 인증 주체, 권한과 refresh session의 의미는 `auth`가 정한다. Spring Security filter와 token 검증 같은 protocol 구현은 `auth/infra/security`에 두며, 공통 응답 계약을 사용하기 위한 `auth -> global` 의존만 허용한다. `global`은 `auth`를 알지 않는다.
+인증·인가의 owner는 `auth` context다. 요청 앞단에서 모든 context에 적용되더라도 JWT claim, 인증 주체, 권한과 refresh session의 의미는 `auth`가 정한다. Spring Security filter와 token 검증 같은 protocol 구현은 `module/auth/infra/security`에 두며, 공통 응답 계약을 사용하기 위한 `module -> global` 의존만 허용한다. `global`은 `module`을 알지 않는다.
+
+`external`은 S3, email provider, Slack과 public API처럼 애플리케이션 밖의 시스템을 호출하는 기술 client를 둔다. 파일 전송과 삭제, 이메일과 메시지 전송, 외부 API 요청처럼 provider protocol에 가까운 동작에만 집중한다. business rule, use case, domain 용어와 context별 orchestration을 소유하지 않는다.
+
+외부 연동 adapter는 사용하는 context의 `infra`가 소유한다. adapter는 context가 정의한 port를 구현하고 domain 의미를 외부 요청으로 변환한 뒤 `external`의 기술 client를 호출한다. `external` client는 context의 port를 직접 구현하지 않고 `module`을 알지 않는다.
+
+```text
+module/<context>/usecase port
+  <- module/<context>/infra adapter
+     -> external technical client
+        -> external system
+```
+
+예를 들어 `external/storage/s3`는 bucket, key와 content를 받아 파일을 전송하거나 삭제할 수 있지만 분실물 이미지나 사용자 프로필 이미지의 의미는 알지 않는다. 파일 경로, metadata, 실패 해석과 호출 시점은 해당 context의 adapter와 use case가 결정한다. 여러 context가 같은 provider를 사용해도 business 의미가 다른 port와 adapter를 편의를 위해 하나로 합치지 않는다.
 
 ## 15. 테스트 전략
 

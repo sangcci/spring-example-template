@@ -2,7 +2,7 @@
 
 ## 1. 소유권과 경계
 
-인증·인가 정책은 `auth` context가 소유한다. 요청 처리의 앞단에서 모든 context에 적용된다는 이유로 `global`에 두지 않는다. JWT 검증, 인증 주체 구성, Spring Security 설정과 CSRF 처리는 `auth/infra/security`에 둔다.
+인증·인가 정책은 `auth` context가 소유한다. 요청 처리의 앞단에서 모든 context에 적용된다는 이유로 `global`에 두지 않는다. JWT 검증, 인증 주체 구성, Spring Security 설정과 CSRF 처리는 `module/auth/infra/security`에 둔다.
 
 `global`은 인증과 관련된 business rule을 소유하지 않는다. `auth`의 security 구현은 일관된 HTTP body를 만들기 위해 `global`의 공통 오류·응답 계약을 사용할 수 있지만, `global`은 `auth`에 의존하지 않는다.
 

@@ -1,4 +1,4 @@
-package com.example.lab.auth.infra.security;
+package com.example.lab.module.auth.infra.security;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

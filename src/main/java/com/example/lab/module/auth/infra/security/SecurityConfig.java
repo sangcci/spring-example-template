@@ -1,4 +1,4 @@
-package com.example.lab.auth.infra.security;
+package com.example.lab.module.auth.infra.security;
 
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;

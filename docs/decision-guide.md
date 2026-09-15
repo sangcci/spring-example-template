@@ -101,7 +101,7 @@ SearchRecruitmentUseCase
 
 ### 기본 위치와 이름
 
-`DSLContext`를 사용하는 코드는 처음부터 `<context>/infra/persistence`로 분리한다. SQL 실행 객체에는 MyBatis에 익숙한 개발자가 역할을 바로 이해할 수 있도록 `*Mapper` 접미사를 사용한다.
+`DSLContext`를 사용하는 코드는 처음부터 `module/<context>/infra/persistence`로 분리한다. SQL 실행 객체에는 MyBatis에 익숙한 개발자가 역할을 바로 이해할 수 있도록 `*Mapper` 접미사를 사용한다.
 
 ```text
 post/
