@@ -1,8 +1,51 @@
+# Gradle
 .gradle/
 build/
 out/
-
-*.iml
-.idea/
-
 !gradle/wrapper/gradle-wrapper.jar
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Eclipse / STS / jdtls
+.apt_generated/
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache/
+bin/
+
+# VS Code
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs and runtime files
+logs/
+*.log
+*.pid
+*.h2.db
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.p8
+*.key
+*.crt
+*.cer
+*.der
+*.pfx
+*.p12
+*.jks
+*.keystore
+credentials.json
+service-account*.json
