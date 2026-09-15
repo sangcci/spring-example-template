@@ -325,7 +325,7 @@ com.example.lab
 │       ├── client              # 외부 HTTP/SDK 구현
 │       ├── messaging
 │       └── security
-└── shared                      # 빈 구조로 제공하고 실제 공통 의미가 생길 때 사용
+└── global                      # context에 속하지 않는 공통 기술 계약과 구현
 ```
 
 빈 package는 사용 가능한 구조와 확장 방향을 보여주기 위해 template에 제공한다. 비어 있다는 이유로 class나 interface를 채우지 않는다. 각 context의 내부 layout은 복잡성의 출처에 따라 달라질 수 있으며, 모든 context에 같은 전술 패턴을 강제하지 않는다.
@@ -343,7 +343,7 @@ com.example.lab
 
 policy에는 `PostPolicy`처럼 context 전체를 포괄하는 이름보다 `PostPublicationPolicy`, `OrderCancellationPolicy`처럼 구체적인 business concept의 이름을 붙인다. 새로운 policy와 package 이름은 AI agent가 독자적으로 확정하지 않고 의미, owner, 사용처와 대안을 먼저 제시한다.
 
-`shared`는 중복 코드를 임시로 옮기는 장소가 아니며, 여러 context에서 의미와 변경 이유가 정말 같은 작은 개념만 둔다.
+`global`은 중복 코드를 임시로 옮기는 장소가 아니다. 특정 context가 소유하지 않는 HTTP 응답, 공통 오류 계약과 요청 로깅처럼 애플리케이션 전체에 같은 의미로 적용되는 기술 관심사만 둔다.
 
 ## 15. 테스트 전략
 

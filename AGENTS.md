@@ -10,7 +10,8 @@
 
 1. [`docs/architecture.md`](docs/architecture.md): 아키텍처의 문제의식, 원칙과 기본 구조를 정의한다.
 2. [`docs/decision-guide.md`](docs/decision-guide.md): 기능 설계, 기술 선택, 코드 리뷰와 기존 시스템 분석의 판단 기준을 정의한다.
-3. 관련 ADR: 해당 결정의 맥락, trade-off와 예외를 설명한다.
+3. [`docs/code-style.md`](docs/code-style.md): 코드의 표현 방식과 불필요한 추상화를 피하는 기준을 정의한다.
+4. 관련 ADR: 해당 결정의 맥락, trade-off와 예외를 설명한다.
 
 이 파일에는 아키텍처 원칙을 복제하지 않는다. 문서와 구현이 충돌하거나 새로운 판단이 필요하면 임의로 한쪽을 따르지 말고, 차이를 드러낸 뒤 문서 또는 ADR과 구현을 함께 갱신한다.
 
@@ -31,7 +32,7 @@
 - JPA, 새로운 persistence 방식, cross-domain write, distributed consistency 방식은 명시적인 결정 없이 도입하지 않는다.
 - generated code를 직접 수정하지 않는다.
 - external provider의 SDK type, presentation DTO와 jOOQ generated type을 다른 boundary로 불필요하게 전파하지 않는다.
-- 테스트만을 위한 interface, generic repository, generic service와 의미 없는 `shared` abstraction을 만들지 않는다.
+- 테스트만을 위한 interface, generic repository, generic service와 의미 없는 `global` abstraction을 만들지 않는다.
 - 이미 표준과 검증된 library로 해결된 security 또는 protocol을 직접 구현하지 않는다.
 - package 구조를 확장하거나 새로운 domain abstraction의 이름을 정해야 하면 근거, owner와 대안을 먼저 제시하고 사용자와 합의한다.
 - domain policy와 SQL predicate에 같은 규칙이 필요하면 동시성 또는 consistency 관점의 이유와 두 구현의 일치성을 검증하는 테스트를 함께 둔다.
