@@ -39,6 +39,31 @@ context 전체를 하나의 유형으로 단정하지 않는다. 설계 전에 I
 input -> presentation -> use case -> domain/Mapper/external port -> output
 ```
 
+### 명시되지 않은 실패 가능성을 다루는 방법
+
+요구사항의 빈틈을 안전장치로 채우지 않는다. 실제 경로가 확인되지 않은 `null`, 잘못된 type, 과거 client, 미래 확장과 일어나지 않아야 할 내부 상태를 추측해 validation, fallback, retry, 호환 경로 또는 abstraction을 추가하지 않는다.
+
+방어 로직은 다음 중 하나로 필요성이 확인될 때만 추가한다.
+
+- 신뢰할 수 없는 외부 입력이나 외부 시스템 응답을 검증해야 한다.
+- nullable type, API 명세 또는 library contract가 해당 상태를 허용한다.
+- business rule이 그 실패를 정상적인 결과로 정의한다.
+- 운영 장애, 재현 가능한 bug 또는 테스트로 실제 failure mode가 확인되었다.
+- security, protocol 또는 concurrency 특성상 별도의 최종 방어선이 필요하다.
+
+추가하기 전에는 다음 질문에 답한다.
+
+1. 그 상태가 발생하는 구체적인 경로는 무엇인가?
+2. 정상 입력, business failure, 외부 장애와 programming error 중 무엇인가?
+3. 현재 boundary가 처리할 owner인가?
+4. 처리하지 않고 실패하게 두면 어떤 구체적인 문제가 생기는가?
+
+Bean Validation을 통과한 use case 입력, non-null로 선언된 내부 type, DB constraint로 보호되는 값과 명시적인 Mapper contract는 해당 boundary 안에서 신뢰한다. 내부 계약이 깨졌다면 임의의 기본값으로 계속 진행하지 않고 원인이 있는 schema, SQL projection, type 또는 호출 경로를 수정한다.
+
+요구사항의 빈틈이 business behavior, data contract 또는 architecture 선택을 바꾼다면 추측하지 않고 가정을 드러내 사용자와 합의한다. 결과를 바꾸지 않는 사소한 구현 선택은 현재 요구를 만족하는 가장 단순한 형태를 선택한다.
+
+이 원칙은 구현 범위에 적용하며 검증 범위를 줄이는 근거로 사용하지 않는다. 코드와 설정은 가상의 가능성을 위해 늘리지 않되, type contract, DB semantics, framework behavior와 외부 protocol은 실제 자료와 테스트로 확인한다.
+
 ## 4. Bounded Context와 ownership 결정
 
 다음 질문으로 경계를 찾는다.
@@ -336,6 +361,8 @@ Testcontainers로 운영과 같은 종류와 가능한 한 가까운 version의 
 - domain model이 business complexity를 실제로 줄이는가?
 - 외부 SDK, DTO, 예외가 infrastructure 밖으로 누출되지 않는가?
 - 표준이나 검증된 library로 해결할 문제를 재구현하지 않았는가?
+- 새 null check, fallback, retry, validation과 호환 경로에 실제 발생 경로와 owner가 있는가?
+- 내부 계약 위반을 빈 값이나 기본값으로 숨기고 있지는 않은가?
 - framework의 hidden behavior가 있다면 테스트와 관찰 방법이 있는가?
 - AI가 수정할 범위와 사람이 검증할 범위가 좁고 명확한가?
 
