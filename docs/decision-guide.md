@@ -181,6 +181,22 @@ domain model은 자신의 invariant만 소유해야 한다. 여러 context의 �
 
 Entity, Value Object, Domain Service와 Domain Policy는 `domain`에 둔다. use case의 요청·결과와 orchestration 전용 type은 `usecase`에 둔다. 타입의 모양이 아니라 business meaning과 ownership으로 위치를 결정한다.
 
+### 여러 값을 반환하는 type 결정
+
+언어가 다중 값 반환을 직접 지원하지 않더라도 반환 편의를 위해 의미 없는 `Map`, 배열 또는 임시 내부 `record`로 값을 묶지 않는다. 먼저 값들이 왜 함께 반환되는지 판단한다.
+
+| 함께 반환하는 값의 의미 | 표현과 위치 |
+|---|---|
+| 하나의 business concept와 invariant | `domain`의 Value Object |
+| use case 실행 결과 또는 orchestration 전용 값 | `usecase`의 result type |
+| HTTP request/response와 JSON 구조 | `presentation`의 DTO |
+| SQL 조회 결과와 화면 중심 shape | `usecase`의 query result 또는 `infra/persistence`의 projection |
+| 외부 provider의 request/response | 해당 `infra/client` 또는 `external` boundary의 DTO |
+
+값들이 서로 독립적이고 함께 변경되거나 검증될 이유가 없다면 하나의 반환 type으로 묶기 전에 책임 있는 method로 분리할 수 있는지 검토한다. 반대로 하나의 SQL snapshot, transaction 또는 business decision으로 함께 반환되어야 한다면 호출 횟수를 늘리기 위해 억지로 method를 분리하지 않고 그 의미를 드러내는 result type을 사용한다.
+
+DTO를 domain Value Object로 재사용하지 않는다. JSON 계층 구조, field 이름이나 외부 contract가 바뀐다는 이유로 domain이 함께 변경되어서는 안 된다. 같은 필드를 가지더라도 소유하는 boundary와 변경 이유가 다르면 별도의 type으로 유지한다.
+
 policy 이름에는 `PostPolicy`처럼 context 전체를 포괄하는 이름보다 `PostPublicationPolicy`, `PostEditingPolicy`, `OrderCancellationPolicy`처럼 판단하는 business concept를 사용한다. 어느 use case가 호출하는지가 아니라 어떤 정책을 소유하는지를 기준으로 이름 붙인다. 새로운 domain abstraction의 이름은 AI agent가 독자적으로 확정하지 않고 의미, owner, 사용 use case와 대안 이름을 먼저 제시한다.
 
 ### SQL-first context에 domain logic을 추가할 때

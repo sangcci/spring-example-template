@@ -346,6 +346,10 @@ com.example.lab
 
 `module`은 단일 Gradle module 안의 bounded context를 한곳에서 식별하기 위한 package다. Gradle multi-module을 의미하지 않는다. `presentation`에는 controller, request/response, message listener와 scheduler처럼 들어오는 protocol을 처리하는 type을 둔다. Entity, Value Object, Domain Service와 Domain Policy는 `domain`에 둔다. use case의 입력·출력과 orchestration 전용 type은 `usecase`에 둔다. `infra`에는 jOOQ, context가 소유하는 외부 연동 adapter, messaging과 security의 구체적인 기술 구현을 둔다.
 
+여러 값을 함께 전달한다는 이유만으로 type을 `domain`에 두지 않는다. 값들이 하나의 business concept와 invariant를 표현하면 Value Object로 모델링해 `domain`에 둔다. use case 실행 결과와 orchestration을 위한 값은 `usecase`가 소유하고, HTTP request/response와 JSON 표현 구조는 `presentation`이 소유한다. SQL 조회 결과는 사용 목적과 mapping boundary에 따라 `usecase`의 query result 또는 `infra/persistence`의 projection으로 표현한다. 외부 provider의 payload는 해당 infrastructure boundary 밖으로 전파하지 않는다.
+
+따라서 domain Value Object, use case result, query projection과 presentation DTO는 같은 모양이더라도 서로 대체하지 않는다. protocol이나 화면 구조의 변경이 domain model을 변경하게 만들지 않고, domain model도 JSON 계층 구조나 persistence projection에 맞추어 변형하지 않는다.
+
 policy에는 `PostPolicy`처럼 context 전체를 포괄하는 이름보다 `PostPublicationPolicy`, `OrderCancellationPolicy`처럼 구체적인 business concept의 이름을 붙인다. 새로운 policy와 package 이름은 AI agent가 독자적으로 확정하지 않고 의미, owner, 사용처와 대안을 먼저 제시한다.
 
 `global`은 중복 코드를 임시로 옮기는 장소가 아니다. 특정 context가 소유하지 않는 HTTP 응답, 공통 오류 계약과 요청 로깅처럼 애플리케이션 전체에 같은 의미로 적용되는 기술 관심사만 둔다. business rule, use case, domain policy와 특정 context가 의미를 정하는 오류는 `global`에 두지 않는다.
