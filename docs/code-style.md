@@ -64,7 +64,32 @@ tokenStore.save(account.getId(), new AccessToken(tokenValue, clock.instant().plu
 
 단지 한 method에서만 사용한다는 이유로 class 내부에 임시 `record`를 만들지 않는다. 여러 값이 하나의 business concept를 표현하면 domain Value Object로, use case의 실행 결과이면 use case result로, 조회 결과이면 query result 또는 projection으로 표현한다. 값들이 독립적인 책임이라면 method를 나눌 수 있는지 검토한다.
 
-HTTP request/response DTO는 JSON 계층 구조를 직접 표현하기 위해 DTO 안에 `record`를 중첩할 수 있다.
+최상위 HTTP response DTO는 API contract를 파일 단위로 찾고 검토할 수 있도록 presentation package의 별도 파일에 `record`로 작성한다. use case result를 response body로 변환해야 한다면 response DTO가 순수한 `from` factory method를 소유할 수 있다.
+
+```java
+public record RecruitmentResponse(long recruitmentId, OwnerResponse owner) {
+
+    public static RecruitmentResponse from(RecruitmentResult result) {
+        long recruitmentId = result.recruitmentId();
+        OwnerResult ownerResult = result.owner();
+        OwnerResponse owner = OwnerResponse.from(ownerResult);
+        return new RecruitmentResponse(recruitmentId, owner);
+    }
+
+    public record OwnerResponse(long id, String nickname) {
+
+        private static OwnerResponse from(OwnerResult result) {
+            long id = result.id();
+            String nickname = result.nickname();
+            return new OwnerResponse(id, nickname);
+        }
+    }
+}
+```
+
+`from`은 이미 계산된 use case result를 HTTP body 구조로 옮기는 일만 담당한다. Mapper, 외부 API, `Clock`, cookie, HTTP header를 호출하거나 business rule을 판단하지 않는다. cookie와 header 조합은 controller에 둔다.
+
+HTTP request DTO와 response 내부의 JSON 계층 구조는 DTO 안에 `record`를 중첩할 수 있다.
 
 ```java
 public record RecruitmentResponse(long recruitmentId, OwnerResponse owner) {
@@ -78,7 +103,7 @@ public record RecruitmentResponse(long recruitmentId, OwnerResponse owner) {
 - 독립적인 business concept, lifecycle 또는 invariant를 소유하지 않는다.
 - 다른 boundary에서 재사용하기 위한 공통 type이 아니다.
 
-중첩 type이 독립적으로 사용되거나 여러 contract에서 반복되면 단순 중복 제거가 아니라 의미, owner와 변경 이유를 확인한 뒤 별도 type으로 분리한다. presentation DTO를 domain Value Object로 사용하거나 domain type에 JSON 구조를 반영하지 않는다.
+중첩 type이 독립적으로 사용되거나 여러 contract에서 반복되면 단순 중복 제거가 아니라 의미, owner와 변경 이유를 확인한 뒤 별도 type으로 분리한다. 최상위 response DTO를 controller 내부에 선언하지 않는다. presentation DTO를 domain Value Object로 사용하거나 domain type에 JSON 구조를 반영하지 않는다.
 
 ## 7. 반복과 분기
 

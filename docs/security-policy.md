@@ -38,9 +38,13 @@ refresh token은 사용할 때마다 회전한다. 기존 token 소비와 새 to
 
 Redis 장애 시 로그인과 refresh는 fail closed한다. 유효한 access JWT를 사용하는 일반 요청은 access token 만료 전까지 Redis 장애와 독립적으로 처리한다.
 
+회원가입은 PostgreSQL에 account를 추가한 뒤 같은 use case의 transaction 안에서 refresh session을 Redis에 저장한다. Redis 저장이 실패하면 예외를 반환해 PostgreSQL 변경을 rollback한다. Redis 저장 후 PostgreSQL commit이 실패해 남은 refresh session에는 별도의 보상 삭제나 retry를 적용하지 않고 session TTL로 정리한다. 이 경우 token과 token hash를 제외한 session 식별자와 실패 단계를 구조화 로그로 남긴다.
+
 ## 5. Browser 보안
 
-access token과 refresh token은 `HttpOnly` cookie로 전달하며 운영 환경에서는 `Secure`를 사용한다. cookie의 `SameSite`, `Path`, 만료와 domain은 auth API와 배포 topology를 확정할 때 명시한다. 상위 domain을 공유해야 한다는 근거가 없다면 host-only cookie를 사용한다.
+frontend와 auth API는 서로 다른 subdomain에 배포한다. access token과 refresh token은 auth API host-only `HttpOnly` cookie로 전달하며 운영 환경에서는 `Secure`를 사용한다. 두 cookie는 `SameSite=Lax`를 사용하고, auth API가 처리하는 요청에만 전송되도록 Path를 제한한다.
+
+CSRF token은 frontend가 읽어 요청 header로 전송해야 하므로 `HttpOnly`로 만들지 않는다. CSRF token cookie만 frontend와 auth API가 공유하는 상위 domain을 사용한다.
 
 cookie가 browser 요청에 자동으로 포함되므로 CSRF protection을 활성화한다. CSRF token을 cookie로 전달하고 변경 요청에서는 header로 다시 보내게 한다. CORS는 허용 origin을 설정으로 열거하며 credentials와 wildcard origin을 함께 사용하지 않는다.
 

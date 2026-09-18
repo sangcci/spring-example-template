@@ -4,6 +4,8 @@ spring:
   config:
     activate:
       on-profile: test
+  flyway:
+    enabled: false
 
 management:
   endpoints:
@@ -25,6 +27,15 @@ server:
   shutdown: graceful
 
 security:
+  auth:
+    access-token-ttl: 15m
+    standard-refresh-ttl: 14d
+    remember-me-refresh-ttl: 30d
+    refresh-token-cookie-name: refresh-token
+    secure-cookies: false
+    csrf-cookie-domain: ""
+    allowed-origins:
+      - http://localhost:3000
   jwt:
     secret-base64: MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=
     issuer: spring-example-template
