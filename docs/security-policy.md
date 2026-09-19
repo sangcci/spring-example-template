@@ -30,6 +30,8 @@ JWT에는 이메일, 닉네임과 같은 개인정보를 넣지 않는다. filte
 
 JWT 원문과 cookie 값은 로그에 남기지 않는다. 외부 응답은 token 만료, signature 불일치와 claim 오류를 구분하지 않고 `AUTH_INVALID_ACCESS_TOKEN`으로 반환한다. 내부 로그와 metric에서는 원인을 구분할 수 있다.
 
+filter는 검증한 `sub`를 `long` account ID로 변환해 Spring Security principal에 저장한다. 인증이 필요한 controller는 `Authentication`이나 JWT claim을 직접 해석하지 않고 `@AuthenticatedAccountId long accountId`로 현재 계정 ID를 받는다. 이 어노테이션은 Spring Security의 `@AuthenticationPrincipal`을 사용하며, account ID를 use case에 전달하는 HTTP 경계에서만 사용한다.
+
 ## 4. Refresh session
 
 refresh token은 JWT가 아닌 opaque random token을 사용하고 Redis에 session을 저장한다. Redis에는 token 원문을 저장하지 않고 session ID, token hash, account ID, family ID, 상태와 만료 시각을 TTL과 함께 저장한다.

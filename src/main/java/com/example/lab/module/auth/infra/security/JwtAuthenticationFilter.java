@@ -64,11 +64,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
 
             var claims = signedClaims.getPayload();
-            String accountId = claims.getSubject();
+            String accountIdValue = claims.getSubject();
             String role = claims.get("role", String.class);
             String tokenType = claims.get("token_type", String.class);
 
-            if (accountId == null || accountId.isBlank()) {
+            if (accountIdValue == null || accountIdValue.isBlank()) {
                 throw new JwtException("subject claim is required");
             }
             if (role == null || role.isBlank()) {
@@ -90,7 +90,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 throw new JwtException("exp claim is required");
             }
 
-            Long.parseLong(accountId);
+            long accountId = Long.parseLong(accountIdValue);
             var authority = new SimpleGrantedAuthority("ROLE_" + role);
             var authentication = UsernamePasswordAuthenticationToken.authenticated(accountId, null, List.of(authority));
             var securityContext = SecurityContextHolder.createEmptyContext();
