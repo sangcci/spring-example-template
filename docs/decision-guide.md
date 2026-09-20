@@ -352,17 +352,7 @@ OAuth, OIDC, JWT, PKCE, signature, password hashing과 cryptography는 직접 �
 
 ## 15. 테스트 선택
 
-| 위험 | 우선 테스트 |
-|---|---|
-| SQL, mapping, constraint | 실제 DB integration test |
-| locking, concurrency, isolation | 병렬 실행을 포함한 실제 DB integration test |
-| transaction rollback과 commit | use case integration test |
-| pure business rule과 계산 | unit test |
-| state transition | domain model unit test |
-| 외부 protocol mapping과 오류 | client contract test |
-| application wiring과 핵심 흐름 | 제한된 end-to-end test |
-
-Testcontainers로 운영과 같은 종류와 가능한 한 가까운 version의 DB를 사용한다. mock repository interaction보다 실제 invariant가 보호되는지를 검증한다.
+검증할 위험, 함께 실행할 범위와 테스트의 목적을 분리해 판단한다. 구체적인 선택 기준과 작성 형식은 [Test Guide](test-guide.md)를 따른다.
 
 ## 16. 코드 리뷰 체크리스트
 

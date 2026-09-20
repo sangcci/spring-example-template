@@ -371,19 +371,9 @@ module/<context>/usecase port
 
 ## 15. 테스트 전략
 
-SQL-first 구조에서는 DB integration test의 비중이 높다. Testcontainers와 운영에서 사용하는 PostgreSQL 또는 MySQL을 이용해 다음을 검증한다.
-
-- migration과 SQL correctness
-- constraint와 오류 변환
-- transaction boundary와 rollback
-- locking, concurrency와 isolation
-- projection mapping과 query performance의 주요 가정
-
-mock repository를 통한 interaction test를 기본값으로 두지 않는다. 복잡한 pure business logic, 계산, policy, state transition은 빠른 unit test로 검증한다. 외부 client는 contract test로 protocol mapping과 실패 처리를 확인한다. 핵심 use case에는 필요한 범위의 end-to-end test를 둔다.
+테스트의 검증 대상, 실행 범위, 목적과 작성 형식은 [Test Guide](test-guide.md)를 따른다.
 
 API 문서는 Spring REST Docs 테스트 결과를 source of truth로 사용한다. 같은 테스트에서 `restdocs-api-spec`용 snippet을 생성해 OpenAPI 명세로 변환하고, Swagger UI는 이 명세만 읽는다. production controller에 문서 생성을 위한 annotation을 추가하거나 별도의 OpenAPI 명세를 함께 관리하지 않는다.
-
-테스트 데이터는 Instancio로 유효한 기본값을 만들 수 있지만, 검증하려는 조건과 business invariant에 영향을 주는 값은 테스트에서 명시한다. DB와 Redis의 실제 semantics를 검증할 때는 해당 제품이 결정된 뒤 Testcontainers 전용 모듈과 container 설정을 추가한다. 테스트 기반만을 위해 공통 Fixture 계층이나 container 추상화를 미리 만들지 않는다.
 
 ## 16. AI-native 작업 방식
 

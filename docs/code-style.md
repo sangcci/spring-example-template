@@ -143,3 +143,7 @@ public record RecruitmentResponse(long recruitmentId, OwnerResponse owner) {
 - DTO, use case result, query projection과 domain Value Object의 owner가 구분되는가?
 - 발생 경로가 없는 `null`과 invalid state를 추측해 분기를 추가하지 않았는가?
 - fallback이나 broad catch가 contract 위반과 원래 실패를 숨기지는 않는가?
+
+## 10. 테스트 코드
+
+테스트의 선택, 이름, 구조와 Given, When, Then 작성 기준은 [Test Guide](test-guide.md)를 따른다. 이 문서는 production code의 표현 기준만 정의한다.
