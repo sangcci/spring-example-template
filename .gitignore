@@ -33,6 +33,9 @@ logs/
 *.pid
 *.h2.db
 
+# Node.js tooling
+node_modules/
+
 # Local environment and secrets
 .env
 .env.*

@@ -12,11 +12,12 @@
 2. [`docs/decision-guide.md`](docs/decision-guide.md): 기능 설계, 기술 선택, 코드 리뷰와 기존 시스템 분석의 판단 기준을 정의한다.
 3. [`docs/code-style.md`](docs/code-style.md): 코드의 표현 방식과 불필요한 추상화를 피하는 기준을 정의한다.
 4. [`docs/configuration-guide.md`](docs/configuration-guide.md): profile별 YAML 구조, 환경변수와 test 더미 값의 표현 기준을 정의한다.
-5. [`docs/test-guide.md`](docs/test-guide.md): 테스트의 검증 대상, 실행 범위, 목적과 표현 방식을 정의한다.
-6. [`docs/time-policy.md`](docs/time-policy.md): 업무 시간대, 저장 시각과 API 시간 표현 기준을 정의한다.
-7. [`docs/security-policy.md`](docs/security-policy.md): access JWT 인증, browser cookie와 refresh session의 보안 기준을 정의한다.
-8. 관련 [`docs/policies/`](docs/policies/): bounded context가 소유하는 업무 정책을 정의한다.
-9. 관련 ADR: 해당 결정의 맥락, trade-off와 예외를 설명한다.
+5. [`docs/git-guide.md`](docs/git-guide.md): 커밋 단위, 메시지 형식과 Commitlint 사용 기준을 정의한다.
+6. [`docs/test-guide.md`](docs/test-guide.md): 테스트의 검증 대상, 실행 범위, 목적과 표현 방식을 정의한다.
+7. [`docs/time-policy.md`](docs/time-policy.md): 업무 시간대, 저장 시각과 API 시간 표현 기준을 정의한다.
+8. [`docs/security-policy.md`](docs/security-policy.md): access JWT 인증, browser cookie와 refresh session의 보안 기준을 정의한다.
+9. 관련 [`docs/policies/`](docs/policies/): bounded context가 소유하는 업무 정책을 정의한다.
+10. 관련 ADR: 해당 결정의 맥락, trade-off와 예외를 설명한다.
 
 이 파일에는 아키텍처 원칙을 복제하지 않는다. 문서와 구현이 충돌하거나 새로운 판단이 필요하면 임의로 한쪽을 따르지 말고, 차이를 드러낸 뒤 문서 또는 ADR과 구현을 함께 갱신한다.
 
@@ -31,6 +32,7 @@
 7. 가장 위험한 가정을 중심으로 테스트한다. SQL과 DB semantics는 가능한 한 실제 대상 DB에서 검증한다.
 8. Java 또는 Gradle 파일을 변경하면 `spotlessCheck`를 실행하고, 필요할 때 `spotlessApply`로 수정한 뒤 다시 검증한다.
 9. 기존 원칙의 예외나 장기적인 trade-off가 생기면 ADR을 작성하거나 사용자에게 제안한다.
+10. 커밋 요청을 받으면 `docs/git-guide.md`의 type과 한글 개조식 메시지 규칙을 따르고 Commitlint를 통과하는지 확인한다.
 
 ## Change Boundaries
 
