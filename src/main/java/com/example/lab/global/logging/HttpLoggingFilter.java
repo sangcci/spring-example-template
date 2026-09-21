@@ -20,7 +20,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class HttpLoggingFilter extends OncePerRequestFilter {
 
     public static final String REQUEST_ID_HEADER = "X-Request-Id";
-    public static final String REQUEST_ID_MDC_KEY = "requestId";
+    public static final String REQUEST_ID_MDC_KEY = "request_id";
 
     private static final Logger log = LoggerFactory.getLogger(HttpLoggingFilter.class);
     private static final Pattern VALID_REQUEST_ID = Pattern.compile("[A-Za-z0-9._:-]{1,128}");
@@ -43,12 +43,18 @@ public class HttpLoggingFilter extends OncePerRequestFilter {
                 boolean shouldLog = !uri.equals("/actuator") && !uri.startsWith("/actuator/");
                 if (shouldLog) {
                     long durationMillis = (System.nanoTime() - startedAt) / 1_000_000;
-                    log.info(
-                            "http_request method={} uri={} status={} durationMs={}",
-                            request.getMethod(),
-                            uri,
-                            response.getStatus(),
-                            durationMillis);
+                    log.atInfo()
+                            .addKeyValue("event", "http_request")
+                            .addKeyValue("http_method", request.getMethod())
+                            .addKeyValue("uri", uri)
+                            .addKeyValue("status", response.getStatus())
+                            .addKeyValue("duration_ms", durationMillis)
+                            .log(
+                                    "HTTP {} {} -> {} ({}ms)",
+                                    request.getMethod(),
+                                    uri,
+                                    response.getStatus(),
+                                    durationMillis);
                 }
             }
         }

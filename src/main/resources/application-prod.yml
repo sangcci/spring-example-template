@@ -3,17 +3,17 @@ spring:
     name: spring-example-template
   config:
     activate:
-      on-profile: local
+      on-profile: prod
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/spring_example}
-    username: ${DB_USERNAME:spring_example}
-    password: ${DB_PASSWORD:spring_example}
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
   flyway:
     enabled: true
   data:
     redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
       connect-timeout: 1s
       timeout: 1s
 
@@ -45,10 +45,10 @@ security:
     standard-refresh-ttl: 14d
     remember-me-refresh-ttl: 30d
     refresh-token-cookie-name: refresh-token
-    secure-cookies: false
-    csrf-cookie-domain: ${CSRF_COOKIE_DOMAIN:}
+    secure-cookies: true
+    csrf-cookie-domain: ${CSRF_COOKIE_DOMAIN}
     allowed-origins:
-      - ${FRONTEND_ORIGIN:http://localhost:3000}
+      - ${FRONTEND_ORIGIN}
   jwt:
     secret-base64: ${JWT_SECRET_BASE64}
     issuer: spring-example-template
@@ -59,4 +59,4 @@ security:
 logging:
   structured:
     format:
-      console: ${LOGGING_STRUCTURED_FORMAT:}
+      console: ${LOGGING_STRUCTURED_FORMAT:logstash}

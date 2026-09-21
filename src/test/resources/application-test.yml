@@ -4,8 +4,18 @@ spring:
   config:
     activate:
       on-profile: test
+  datasource:
+    url: jdbc:postgresql://invalid:5432/invalid
+    username: invalid
+    password: invalid
   flyway:
     enabled: false
+  data:
+    redis:
+      host: invalid
+      port: 1
+      connect-timeout: 1s
+      timeout: 1s
 
 management:
   endpoints:
@@ -45,3 +55,8 @@ security:
     audience: spring-example-template-api
     access-token-cookie-name: access-token
     allowed-clock-skew: 30s
+
+logging:
+  structured:
+    format:
+      console: ${LOGGING_STRUCTURED_FORMAT:}
