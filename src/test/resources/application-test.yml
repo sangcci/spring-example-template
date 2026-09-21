@@ -26,6 +26,9 @@ management:
 server:
   shutdown: graceful
 
+user:
+  withdrawn-account-cleanup-cron: "0 0 3 * * *"
+
 security:
   auth:
     access-token-ttl: 15m

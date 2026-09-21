@@ -19,9 +19,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class RefreshSessionStore {
 
-    private static final String SESSION_KEY_PREFIX = "auth:refresh:session:";
-    private static final String FAMILY_KEY_PREFIX = "auth:refresh:family:";
-    private static final String ACCOUNT_KEY_PREFIX = "auth:refresh:account:";
+    private static final String SESSION_KEY_PREFIX = "auth:refresh:{auth-refresh}:session:";
+    private static final String FAMILY_KEY_PREFIX = "auth:refresh:{auth-refresh}:family:";
+    private static final String ACCOUNT_KEY_PREFIX = "auth:refresh:{auth-refresh}:account:";
 
     private static final DefaultRedisScript<Long> ISSUE_SCRIPT = new DefaultRedisScript<>("""
             redis.call('HSET', KEYS[1],

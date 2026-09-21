@@ -1,9 +1,9 @@
 package com.example.lab.module.user.usecase;
 
+import com.example.lab.module.user.domain.EmailPolicy;
 import com.example.lab.module.user.infra.persistence.UserAccountMapper;
 import java.time.Clock;
 import java.time.Instant;
-import java.util.Locale;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,16 +12,18 @@ import org.springframework.transaction.annotation.Transactional;
 public class FindLoginAccountUseCase {
 
     private final UserAccountMapper userAccountMapper;
+    private final EmailPolicy emailPolicy;
     private final Clock clock;
 
-    public FindLoginAccountUseCase(UserAccountMapper userAccountMapper, Clock clock) {
+    public FindLoginAccountUseCase(UserAccountMapper userAccountMapper, EmailPolicy emailPolicy, Clock clock) {
         this.userAccountMapper = userAccountMapper;
+        this.emailPolicy = emailPolicy;
         this.clock = clock;
     }
 
     @Transactional
     public Optional<UserAccount> executeByEmail(String email) {
-        String normalizedEmail = email.strip().toLowerCase(Locale.ROOT);
+        String normalizedEmail = emailPolicy.normalize(email);
         Optional<UserAccount> accountResult = userAccountMapper.findByEmail(normalizedEmail);
         if (accountResult.isEmpty()) {
             return Optional.empty();

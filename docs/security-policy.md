@@ -38,6 +38,8 @@ refresh token은 JWT가 아닌 opaque random token을 사용하고 Redis에 sess
 
 refresh token은 사용할 때마다 회전한다. 기존 token 소비와 새 token 발급은 Redis에서 원자적으로 처리한다. 이미 사용된 token이 다시 들어오면 replay로 판단하고 같은 family의 refresh session을 폐기한다.
 
+refresh session 관련 key는 Redis Cluster에서도 Lua script의 모든 key가 같은 hash slot에 배치되도록 공통 hash tag `{auth-refresh}`를 사용합니다. 이 방식은 refresh session을 한 slot에 집중시키므로 해당 slot의 메모리와 처리량이 병목이 되면 account 단위 partition과 별도 lookup 구조를 검토합니다.
+
 Redis 장애 시 로그인과 refresh는 fail closed한다. 유효한 access JWT를 사용하는 일반 요청은 access token 만료 전까지 Redis 장애와 독립적으로 처리한다.
 
 회원가입은 PostgreSQL에 account를 추가한 뒤 같은 use case의 transaction 안에서 refresh session을 Redis에 저장한다. Redis 저장이 실패하면 예외를 반환해 PostgreSQL 변경을 rollback한다. Redis 저장 후 PostgreSQL commit이 실패해 남은 refresh session에는 별도의 보상 삭제나 retry를 적용하지 않고 session TTL로 정리한다. 이 경우 token과 token hash를 제외한 session 식별자와 실패 단계를 구조화 로그로 남긴다.

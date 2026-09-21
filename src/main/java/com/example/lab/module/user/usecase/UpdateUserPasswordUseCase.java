@@ -1,6 +1,7 @@
 package com.example.lab.module.user.usecase;
 
 import com.example.lab.global.error.ApplicationException;
+import com.example.lab.module.user.domain.PasswordPolicy;
 import com.example.lab.module.user.infra.persistence.UserAccountMapper;
 import java.time.Clock;
 import java.time.Instant;
@@ -13,24 +14,23 @@ public class UpdateUserPasswordUseCase {
 
     private final UserAccountMapper userAccountMapper;
     private final PasswordEncoder passwordEncoder;
+    private final PasswordPolicy passwordPolicy;
     private final Clock clock;
 
     public UpdateUserPasswordUseCase(
-            UserAccountMapper userAccountMapper, PasswordEncoder passwordEncoder, Clock clock) {
+            UserAccountMapper userAccountMapper,
+            PasswordEncoder passwordEncoder,
+            PasswordPolicy passwordPolicy,
+            Clock clock) {
         this.userAccountMapper = userAccountMapper;
         this.passwordEncoder = passwordEncoder;
+        this.passwordPolicy = passwordPolicy;
         this.clock = clock;
     }
 
     @Transactional
     public void execute(long accountId, String currentPasswordHash, String newPassword) {
-        boolean validPassword = newPassword.length() >= 8
-                && newPassword.length() <= 16
-                && newPassword.matches(".*[A-Z].*")
-                && newPassword.matches(".*[a-z].*")
-                && newPassword.matches(".*[0-9].*")
-                && newPassword.matches(".*[!@#$%^&*()\\-_=+\\[{\\]}\\\\|;:'\",<.>/?].*")
-                && !newPassword.matches(".*\\s.*");
+        boolean validPassword = passwordPolicy.isValid(newPassword);
         if (!validPassword) {
             throw new ApplicationException(UserErrorCode.INVALID_PASSWORD);
         }

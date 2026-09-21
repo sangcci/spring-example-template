@@ -17,6 +17,7 @@ import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -50,7 +51,8 @@ public class AuthController {
     }
 
     @GetMapping("/csrf")
-    public ApiSuccessResponse<Void> csrf() {
+    public ApiSuccessResponse<Void> csrf(CsrfToken csrfToken) {
+        csrfToken.getToken();
         return ApiSuccessResponse.empty();
     }
 

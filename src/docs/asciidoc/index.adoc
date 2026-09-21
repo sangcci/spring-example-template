@@ -8,3 +8,61 @@
 이 문서는 Spring REST Docs 테스트를 통과한 API의 요청과 응답을 설명한다.
 
 대화형 API 문서는 `/swagger-ui/index.html`에서 확인한다.
+
+== Authentication
+
+=== CSRF token 발급
+
+include::{snippets}/auth-csrf/http-request.adoc[]
+include::{snippets}/auth-csrf/http-response.adoc[]
+include::{snippets}/auth-csrf/response-cookies.adoc[]
+
+=== 회원가입
+
+include::{snippets}/auth-sign-up/http-request.adoc[]
+include::{snippets}/auth-sign-up/request-headers.adoc[]
+include::{snippets}/auth-sign-up/request-cookies.adoc[]
+include::{snippets}/auth-sign-up/http-response.adoc[]
+include::{snippets}/auth-sign-up/response-cookies.adoc[]
+
+=== 로그인
+
+include::{snippets}/auth-login/http-request.adoc[]
+include::{snippets}/auth-login/request-headers.adoc[]
+include::{snippets}/auth-login/request-cookies.adoc[]
+include::{snippets}/auth-login/http-response.adoc[]
+include::{snippets}/auth-login/response-cookies.adoc[]
+
+=== 인증 갱신
+
+include::{snippets}/auth-refresh/http-request.adoc[]
+include::{snippets}/auth-refresh/request-headers.adoc[]
+include::{snippets}/auth-refresh/request-cookies.adoc[]
+include::{snippets}/auth-refresh/http-response.adoc[]
+include::{snippets}/auth-refresh/response-cookies.adoc[]
+
+=== 로그아웃
+
+include::{snippets}/auth-logout/http-request.adoc[]
+include::{snippets}/auth-logout/request-headers.adoc[]
+include::{snippets}/auth-logout/request-cookies.adoc[]
+include::{snippets}/auth-logout/http-response.adoc[]
+include::{snippets}/auth-logout/response-cookies.adoc[]
+
+== Account Security
+
+=== 비밀번호 변경
+
+include::{snippets}/account-change-password/http-request.adoc[]
+include::{snippets}/account-change-password/request-headers.adoc[]
+include::{snippets}/account-change-password/request-cookies.adoc[]
+include::{snippets}/account-change-password/http-response.adoc[]
+include::{snippets}/account-change-password/response-cookies.adoc[]
+
+=== 회원 탈퇴
+
+include::{snippets}/account-withdrawal/http-request.adoc[]
+include::{snippets}/account-withdrawal/request-headers.adoc[]
+include::{snippets}/account-withdrawal/request-cookies.adoc[]
+include::{snippets}/account-withdrawal/http-response.adoc[]
+include::{snippets}/account-withdrawal/response-cookies.adoc[]

@@ -2,57 +2,68 @@ package com.example.lab.module.auth.usecase;
 
 import static com.example.lab.generated.jooq.tables.UserAccount.USER_ACCOUNT;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
+import com.example.lab.module.auth.infra.persistence.IssuedRefreshSession;
 import com.example.lab.module.auth.infra.persistence.RefreshSessionStore;
-import org.jooq.DSLContext;
+import com.example.lab.support.IntegrationTestSupport;
+import java.time.Instant;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataAccessResourceFailureException;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.postgresql.PostgreSQLContainer;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
-@SpringBootTest
-@Testcontainers
-class SignUpUseCaseIntegrationTest {
-
-    @Container
-    static final PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:17-alpine");
-
-    @DynamicPropertySource
-    static void properties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
-        registry.add("spring.flyway.enabled", () -> true);
-    }
+class SignUpUseCaseIntegrationTest extends IntegrationTestSupport {
 
     @Autowired
     SignUpUseCase signUpUseCase;
-
-    @Autowired
-    DSLContext dsl;
 
     @MockitoBean
     RefreshSessionStore refreshSessionStore;
 
     @Test
-    void redis에_refresh_session을_저장하지_못하면_account_insert를_rollback한다() {
+    @DisplayName("refresh session을 저장하지 못하면 생성한 계정도 rollback한다")
+    void rollsBackAccountWhenRefreshSessionIssueFails() {
+        // given
         when(refreshSessionStore.issue(anyLong(), any(), any()))
                 .thenThrow(new DataAccessResourceFailureException("redis unavailable"));
 
-        assertThatThrownBy(() -> signUpUseCase.execute("user@example.com", "Password1!", false))
-                .isInstanceOf(DataAccessResourceFailureException.class);
+        // when
+        Throwable thrown = catchThrowable(() -> signUpUseCase.execute("user@example.com", "Password1!", false));
 
-        int accountCount = dsl.fetchCount(USER_ACCOUNT);
-        assertThat(accountCount).isZero();
+        // then
+        assertThat(thrown).isInstanceOf(DataAccessResourceFailureException.class);
+        assertThat(dsl.fetchCount(USER_ACCOUNT)).isZero();
+    }
+
+    @Test
+    @DisplayName("refresh session 저장 후 database commit에 실패하면 계정 생성을 rollback한다")
+    void rollsBackAccountWhenDatabaseCommitFails() {
+        // given
+        Instant expiresAt = Instant.now().plusSeconds(14 * 24 * 60 * 60L);
+        IssuedRefreshSession issuedSession = new IssuedRefreshSession("session-id", "raw-token", expiresAt);
+        when(refreshSessionStore.issue(anyLong(), any(), any())).thenAnswer(invocation -> {
+            TransactionSynchronization synchronization = new TransactionSynchronization() {
+                @Override
+                public void beforeCommit(boolean readOnly) {
+                    throw new IllegalStateException("database commit failed");
+                }
+            };
+            TransactionSynchronizationManager.registerSynchronization(synchronization);
+            return issuedSession;
+        });
+
+        // when
+        Throwable thrown = catchThrowable(() -> signUpUseCase.execute("user@example.com", "Password1!", false));
+
+        // then
+        assertThat(thrown).isInstanceOf(IllegalStateException.class).hasMessage("database commit failed");
+        assertThat(dsl.fetchCount(USER_ACCOUNT)).isZero();
     }
 }

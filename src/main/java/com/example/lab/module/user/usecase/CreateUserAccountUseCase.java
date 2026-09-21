@@ -1,11 +1,12 @@
 package com.example.lab.module.user.usecase;
 
 import com.example.lab.global.error.ApplicationException;
+import com.example.lab.module.user.domain.EmailPolicy;
+import com.example.lab.module.user.domain.PasswordPolicy;
 import com.example.lab.module.user.infra.persistence.UserAccountMapper;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Locale;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -14,34 +15,36 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class CreateUserAccountUseCase {
 
+    private static final int EMAIL_REJOIN_RESTRICTION_DAYS = 7;
+
     private final UserAccountMapper userAccountMapper;
     private final PasswordEncoder passwordEncoder;
+    private final EmailPolicy emailPolicy;
+    private final PasswordPolicy passwordPolicy;
     private final Clock clock;
 
-    public CreateUserAccountUseCase(UserAccountMapper userAccountMapper, PasswordEncoder passwordEncoder, Clock clock) {
+    public CreateUserAccountUseCase(
+            UserAccountMapper userAccountMapper,
+            PasswordEncoder passwordEncoder,
+            EmailPolicy emailPolicy,
+            PasswordPolicy passwordPolicy,
+            Clock clock) {
         this.userAccountMapper = userAccountMapper;
         this.passwordEncoder = passwordEncoder;
+        this.emailPolicy = emailPolicy;
+        this.passwordPolicy = passwordPolicy;
         this.clock = clock;
     }
 
     @Transactional
     public CreatedUserAccount execute(String email, String password) {
-        String normalizedEmail = email.strip().toLowerCase(Locale.ROOT);
-        boolean validEmail = normalizedEmail.length() <= 320
-                && normalizedEmail.indexOf('@') > 0
-                && normalizedEmail.indexOf('@') == normalizedEmail.lastIndexOf('@')
-                && normalizedEmail.indexOf('@') < normalizedEmail.length() - 1;
+        String normalizedEmail = emailPolicy.normalize(email);
+        boolean validEmail = emailPolicy.isValid(normalizedEmail);
         if (!validEmail) {
             throw new ApplicationException(UserErrorCode.INVALID_EMAIL);
         }
 
-        boolean validPassword = password.length() >= 8
-                && password.length() <= 16
-                && password.matches(".*[A-Z].*")
-                && password.matches(".*[a-z].*")
-                && password.matches(".*[0-9].*")
-                && password.matches(".*[!@#$%^&*()\\-_=+\\[{\\]}\\\\|;:'\",<.>/?].*")
-                && !password.matches(".*\\s.*");
+        boolean validPassword = passwordPolicy.isValid(password);
         if (!validPassword) {
             throw new ApplicationException(UserErrorCode.INVALID_PASSWORD);
         }
@@ -51,7 +54,7 @@ public class CreateUserAccountUseCase {
         }
 
         Instant now = clock.instant();
-        Instant rejoinBoundary = now.minus(7, ChronoUnit.DAYS);
+        Instant rejoinBoundary = now.minus(EMAIL_REJOIN_RESTRICTION_DAYS, ChronoUnit.DAYS);
         if (userAccountMapper.existsRecentlyWithdrawn(normalizedEmail, rejoinBoundary)) {
             throw new ApplicationException(UserErrorCode.EMAIL_REJOIN_RESTRICTED);
         }

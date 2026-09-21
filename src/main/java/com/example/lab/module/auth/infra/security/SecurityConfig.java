@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 import javax.crypto.SecretKey;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -19,6 +20,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfFilter;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -50,6 +52,13 @@ public class SecurityConfig {
     }
 
     @Bean
+    public FilterRegistrationBean<CsrfCookieFilter> csrfCookieFilterRegistration(CsrfCookieFilter csrfCookieFilter) {
+        var registration = new FilterRegistrationBean<>(csrfCookieFilter);
+        registration.setEnabled(false);
+        return registration;
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http,
             AuthProperties authProperties,
@@ -69,7 +78,10 @@ public class SecurityConfig {
             }
         });
 
-        http.csrf(csrf -> csrf.csrfTokenRepository(csrfTokenRepository))
+        var csrfTokenRequestHandler = new CsrfTokenRequestAttributeHandler();
+
+        http.csrf(csrf ->
+                        csrf.csrfTokenRepository(csrfTokenRepository).csrfTokenRequestHandler(csrfTokenRequestHandler))
                 .cors(cors -> cors.configurationSource(corsConfigurationSource(authProperties)))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .formLogin(formLogin -> formLogin.disable())

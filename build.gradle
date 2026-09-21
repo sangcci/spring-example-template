@@ -52,8 +52,11 @@ dependencies {
 
 	// Spring Boot Test and REST Docs
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-restdocs'
+	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 	testImplementation 'com.epages:restdocs-api-spec-mockmvc:0.20.1'
+	testImplementation 'org.springframework.security:spring-security-test'
 
 	// Instancio
 	testImplementation 'org.instancio:instancio-junit:6.0.0'

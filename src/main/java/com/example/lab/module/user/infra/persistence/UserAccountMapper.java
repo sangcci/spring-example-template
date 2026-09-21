@@ -122,6 +122,14 @@ public class UserAccountMapper {
         return updated == 1;
     }
 
+    public int deleteWithdrawnAtOrBefore(Instant retentionBoundary) {
+        OffsetDateTime boundary = retentionBoundary.atOffset(ZoneOffset.UTC);
+        return dsl.deleteFrom(USER_ACCOUNT)
+                .where(USER_ACCOUNT.STATUS.eq(UserAccountStatus.WITHDRAWN.name()))
+                .and(USER_ACCOUNT.WITHDRAWN_AT.le(boundary))
+                .execute();
+    }
+
     private Instant toInstant(OffsetDateTime value) {
         if (value == null) {
             return null;
