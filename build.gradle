@@ -116,6 +116,7 @@ tasks.named('test') {
 
 tasks.named('asciidoctor') {
 	dependsOn tasks.named('test')
+	inputs.dir snippetsDirectory
 	attributes 'snippets': snippetsDirectory.get().asFile
 }
 

@@ -1,0 +1,7 @@
+`X-Request-Id` 는 요청과 응답을 연결하는 추적 ID다. client가 `[A-Za-z0-9._:-]` 문자로 구성된 1자 이상 128자 이하의 값을 보내면 server가 같은 값을 응답한다. 생략하거나 형식이 올바르지 않으면 server가 UUID 형식의 새 값을 생성한다.
+
+JSON request body가 있는 요청은 `Content-Type: application/json` 을 사용한다. JSON response body가 있는 응답도 `Content-Type: application/json` 을 사용한다.
+
+include::{snippets}/common-error-response/request-headers.adoc[]
+
+include::{snippets}/common-error-response/response-headers.adoc[]

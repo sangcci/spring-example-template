@@ -1,0 +1,20 @@
+[cols="1,1,1,1,2",options="header"]
+|===
+|Cookie |Path |HttpOnly |SameSite |발급 TTL
+
+|`access-token`
+|`/`
+|`true`
+|`Lax`
+|발급 시점부터 15분
+
+|`refresh-token`
+|`/api/auth`
+|`true`
+|`Lax`
+|일반 로그인은 최초 로그인부터 14일, 자동 로그인은 최초 로그인부터 30일
+|===
+
+발급 cookie는 양수 `Max-Age` 와 token 값을 가지며 해당 기간에 browser가 인증 요청에 사용한다.
+인증을 종료하는 응답의 만료 cookie는 같은 이름과 `Path` 를 유지하고 빈 값과 `Max-Age=0` 을 사용해 browser에 저장된 cookie를 제거한다.
+운영 환경에서는 두 인증 cookie에 `Secure` 를 적용한다.

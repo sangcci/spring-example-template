@@ -1,0 +1,19 @@
+`XSRF-TOKEN` cookie와 `X-XSRF-TOKEN` request header는 같은 CSRF token을 전달한다.
+`POST`, `PATCH`, `DELETE` 처럼 상태를 변경하는 요청은 두 값을 모두 보내야 하며, 값이 없거나 서로 다르면 `403 SECURITY_INVALID_CSRF_TOKEN` 을 반환한다.
+
+[cols="1,1,1,1,3",options="header"]
+|===
+|구분 |이름 |Path |HttpOnly |용도
+
+|Cookie
+|`XSRF-TOKEN`
+|`/`
+|`false`
+|browser가 읽어 request header로 복사하는 CSRF token이다. `SameSite=Lax` 를 사용하며 session cookie로 발급한다.
+
+|Request header
+|`X-XSRF-TOKEN`
+|-
+|-
+|`XSRF-TOKEN` cookie와 같은 값을 전달한다.
+|===

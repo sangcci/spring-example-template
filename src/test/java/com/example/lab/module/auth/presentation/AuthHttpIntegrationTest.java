@@ -44,7 +44,14 @@ class AuthHttpIntegrationTest extends IntegrationTestSupport {
         ResultActions result = mockMvc.perform(get("/api/auth/csrf"));
 
         // then
-        result.andExpect(status().isOk()).andExpect(cookie().exists("XSRF-TOKEN"));
+        MvcResult mvcResult = result.andExpect(status().isOk())
+                .andExpect(cookie().exists("XSRF-TOKEN"))
+                .andExpect(cookie().httpOnly("XSRF-TOKEN", false))
+                .andReturn();
+        Cookie csrfCookie = mvcResult.getResponse().getCookie("XSRF-TOKEN");
+        assertThat(csrfCookie).isNotNull();
+        assertThat(csrfCookie.getPath()).isEqualTo("/");
+        assertThat(csrfCookie.getAttribute("SameSite")).isEqualTo("Lax");
     }
 
     @Test
@@ -89,8 +96,12 @@ class AuthHttpIntegrationTest extends IntegrationTestSupport {
         Cookie refreshCookie = mvcResult.getResponse().getCookie("refresh-token");
         assertThat(storedEmail).isEqualTo("user@example.com");
         assertThat(accessCookie).isNotNull();
+        assertThat(accessCookie.getPath()).isEqualTo("/");
+        assertThat(accessCookie.getAttribute("SameSite")).isEqualTo("Lax");
         assertThat(accessCookie.getMaxAge()).isBetween(899, 900);
         assertThat(refreshCookie).isNotNull();
+        assertThat(refreshCookie.getPath()).isEqualTo("/api/auth");
+        assertThat(refreshCookie.getAttribute("SameSite")).isEqualTo("Lax");
         assertThat(refreshCookie.getMaxAge()).isBetween(14 * 24 * 60 * 60 - 1, 14 * 24 * 60 * 60);
         assertThat(refreshSessionStore.find(refreshCookie.getValue())).isPresent();
     }

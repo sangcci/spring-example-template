@@ -7,7 +7,33 @@
 
 이 문서는 Spring REST Docs 테스트를 통과한 API의 요청과 응답을 설명한다.
 
-대화형 API 문서는 `/swagger-ui/index.html`에서 확인한다.
+대화형 API 문서는 `/swagger-ui/index.html` 에서 확인한다.
+
+== 공통 API 계약
+
+=== 성공 응답
+
+include::{snippets}/common-success-response/response-fields.adoc[]
+
+`result` 는 endpoint별 성공 결과다. 값이 없으면 JSON에서 생략하므로 공통 필드에 포함하지 않고 각 endpoint에서 별도로 설명한다.
+
+=== CSRF
+
+include::src/docs/asciidoc/common/csrf.adoc[]
+
+=== 인증 cookie
+
+include::src/docs/asciidoc/common/auth-cookies.adoc[]
+
+=== 오류 응답
+
+include::{snippets}/common-error-response/response-fields.adoc[]
+
+`errors` 는 request field별 오류가 있을 때만 포함하며, field로 특정할 수 없는 오류에서는 JSON에서 생략한다.
+
+=== HTTP header
+
+include::src/docs/asciidoc/common/http-headers.adoc[]
 
 == Authentication
 

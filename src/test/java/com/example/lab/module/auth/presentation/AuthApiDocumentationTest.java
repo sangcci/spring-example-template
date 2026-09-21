@@ -7,6 +7,9 @@ import static org.springframework.restdocs.cookies.CookieDocumentation.requestCo
 import static org.springframework.restdocs.cookies.CookieDocumentation.responseCookies;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
@@ -50,6 +53,8 @@ class AuthApiDocumentationTest extends IntegrationTestSupport {
         result.andExpect(status().isOk())
                 .andDo(document(
                         "auth-csrf",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
                         resource(ResourceSnippetParameters.builder()
                                 .tag("Authentication")
                                 .summary("CSRF token 발급")
@@ -81,6 +86,8 @@ class AuthApiDocumentationTest extends IntegrationTestSupport {
         result.andExpect(status().isOk())
                 .andDo(document(
                         "auth-sign-up",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
                         resource(ResourceSnippetParameters.builder()
                                 .tag("Authentication")
                                 .summary("회원가입")
@@ -128,6 +135,8 @@ class AuthApiDocumentationTest extends IntegrationTestSupport {
         result.andExpect(status().isOk())
                 .andDo(document(
                         "auth-login",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
                         resource(ResourceSnippetParameters.builder()
                                 .tag("Authentication")
                                 .summary("로그인")
@@ -171,6 +180,8 @@ class AuthApiDocumentationTest extends IntegrationTestSupport {
         result.andExpect(status().isOk())
                 .andDo(document(
                         "auth-refresh",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
                         resource(ResourceSnippetParameters.builder()
                                 .tag("Authentication")
                                 .summary("인증 갱신")
@@ -211,6 +222,8 @@ class AuthApiDocumentationTest extends IntegrationTestSupport {
         result.andExpect(status().isOk())
                 .andDo(document(
                         "auth-logout",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
                         resource(ResourceSnippetParameters.builder()
                                 .tag("Authentication")
                                 .summary("로그아웃")
@@ -255,6 +268,8 @@ class AuthApiDocumentationTest extends IntegrationTestSupport {
         result.andExpect(status().isOk())
                 .andDo(document(
                         "account-change-password",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
                         resource(ResourceSnippetParameters.builder()
                                 .tag("Account Security")
                                 .summary("비밀번호 변경")
@@ -305,6 +320,8 @@ class AuthApiDocumentationTest extends IntegrationTestSupport {
         result.andExpect(status().isOk())
                 .andDo(document(
                         "account-withdrawal",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
                         resource(ResourceSnippetParameters.builder()
                                 .tag("Account Security")
                                 .summary("회원 탈퇴")
