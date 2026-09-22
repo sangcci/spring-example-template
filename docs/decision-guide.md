@@ -199,6 +199,21 @@ DTO를 domain Value Object로 재사용하지 않는다. JSON 계층 구조, fie
 
 policy 이름에는 `PostPolicy`처럼 context 전체를 포괄하는 이름보다 `PostPublicationPolicy`, `PostEditingPolicy`, `OrderCancellationPolicy`처럼 판단하는 business concept를 사용한다. 어느 use case가 호출하는지가 아니라 어떤 정책을 소유하는지를 기준으로 이름 붙인다. 새로운 domain abstraction의 이름은 AI agent가 독자적으로 확정하지 않고 의미, owner, 사용 use case와 대안 이름을 먼저 제시한다.
 
+### 식별자별 조회를 하나의 Policy로 수렴할 때
+
+이메일, 외부 provider ID처럼 use case 입력의 식별자가 달라도 조회의 결과가 같은 domain concept라면, Mapper는 각 식별자에 맞는 명시적인 query로 그 domain 값을 반환한다. Policy는 조회 경로가 아니라 반환된 domain 값을 기준으로 판단한다.
+
+```text
+email 가입       -> email로 User 조회       -> RejoinPolicy(User)
+social 가입      -> provider ID로 User 조회 -> RejoinPolicy(User)
+```
+
+이 원칙은 모든 조회를 하나의 generic method로 통합하라는 뜻이 아니다. SQL의 join과 predicate, index는 식별자별로 명시성을 유지한다. 수렴해야 하는 것은 User 상태, 탈퇴 시각, 권한처럼 같은 업무 사실을 해석하는 Policy다.
+
+Policy에 repository나 Mapper를 주입해 식별자 조회까지 맡기지 않는다. Use Case가 조회와 transaction, 호출 순서를 조율하고 Policy는 이미 확보한 User와 필요한 업무 입력만 판단한다. Policy의 결과가 언제나 같은 business failure라면 boolean을 반환해 호출부가 다시 분기하게 하지 않고 `ensureRejoinAllowed`처럼 실패를 직접 표현하는 command 형태를 선택할 수 있다.
+
+email과 provider ID가 같은 사람, 같은 계정 또는 같은 재가입 제한의 단위인지 확정되지 않았다면 공통 identifier type을 먼저 만들지 않는다. 이는 persistence 리팩터링이 아니라 user identity와 policy 범위를 바꾸는 결정이므로, 정책 문서와 schema를 포함해 별도로 합의한다.
+
 ### SQL-first context에 domain logic을 추가할 때
 
 domain의 성숙은 프로젝트 기간이나 파일 수가 아니라 다음과 같은 관찰된 business complexity를 의미한다.

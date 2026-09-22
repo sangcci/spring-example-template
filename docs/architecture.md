@@ -205,6 +205,23 @@ domain logic이 생겨도 concurrency를 막는 SQL 조건을 제거하지 않�
 
 반대로 SQL의 조건이 동시성 보장과 무관하고 application policy를 단순 복사할 뿐이라면 중복하지 않는다. 이중 구현은 correctness를 위해 두 실행 지점이 모두 필요한 경우에만 감수한다.
 
+### 7.3 식별자 조회와 Policy 판단을 분리한다
+
+같은 domain concept를 이메일, 외부 provider ID 또는 다른 식별자로 찾을 수 있다. 식별자별 조회 경로가 다르다는 이유로 같은 business policy를 여러 Validator에 복제하거나, 반대로 조회 방법을 숨기는 generic repository를 만들지 않는다.
+
+Use Case와 Mapper는 입력의 식별자에 맞는 SQL로 domain 값을 조회한다. 조회는 email 조건일 수도 있고, 외부 계정 table을 거친 join일 수도 있다. 어느 경로를 거치든 이후의 business decision은 조회된 같은 domain concept를 기준으로 한 Policy 하나가 담당한다.
+
+```text
+email / provider ID
+  -> Mapper가 User 조회
+  -> Use Case가 User를 Policy에 전달
+  -> Policy가 User의 상태와 업무 값을 판단
+```
+
+Policy는 Mapper, SQL, 외부 provider SDK 또는 HTTP DTO를 호출하지 않는다. Policy는 이미 확보한 domain 값과 현재 시각, 그리고 정책이 명시적으로 요구하는 입력만 받아 허용·거절과 그 실패 이유를 표현한다. 호출자가 boolean 결과를 해석해 항상 같은 실패를 반환할 뿐이라면 Policy가 그 business failure를 직접 반환하거나 던질 수 있다.
+
+식별자가 실제로 같은 사람 또는 같은 재가입 권한을 뜻하는지는 별도의 업무 정책이다. email, provider ID를 임의의 공통 식별자로 일반화하지 않으며, 그 범위가 바뀌면 정책 문서와 schema, Mapper와 테스트를 함께 변경한다.
+
 ## 8. Database invariant와 transaction
 
 동시에 들어오는 요청 앞에서 애플리케이션의 사전 검증만으로는 invariant를 보장할 수 없다. DB가 더 정확하게 보장할 수 있는 규칙은 DB를 최종 방어선으로 사용한다.
