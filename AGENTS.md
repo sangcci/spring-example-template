@@ -37,6 +37,8 @@ spring-example-template/
 
 문서와 구현이 충돌하면 차이를 드러내고, 확정된 결정에 따라 관련 문서와 구현을 함께 갱신한다. 같은 원칙을 여러 문서에 복제하지 않는다.
 
+설계와 개발 지침은 사람과 AI가 같은 근거를 찾을 수 있도록 짧은 기준, 피할 예시와 권장 예시, 실제 코드 또는 테스트 경로, 예외 조건 순서로 쓴다. 코드와 SQL이 판단을 분명히 보여줄 수 있으면 긴 배경 설명 대신 작은 예시를 사용한다. 업무 정책서는 구현 코드보다 조건과 결과가 드러나는 사례를 사용한다.
+
 ## Workflow
 
 1. 대상 bounded context와 데이터 owner를 식별하고 관련 업무 정책을 확인한다.
@@ -60,6 +62,8 @@ spring-example-template/
 
 ## Commands
 
+Gradle을 실행하기 전에 Java 21을 선택한다. SDKMAN을 사용할 수 있으면 저장소의 `.sdkmanrc`에 따라 `sdk env`를 실행한다. SDKMAN이 없으면 설치된 Java 21 JDK를 `JAVA_HOME`으로 선택한다. 적합한 JDK가 없으면 사용자에게 설치 또는 사용 경로를 확인한다. Gradle의 Java toolchain 설정은 빌드에 사용하는 JDK를 선택하지만, 플러그인을 로드하는 Gradle 실행 JVM까지 Java 21로 바꾸지는 않는다.
+
 ```bash
 ./gradlew bootRun          # local profile로 실행
 ./gradlew test             # test profile로 검증
@@ -68,6 +72,8 @@ spring-example-template/
 ```
 
 커밋 전에는 변경 파일 종류와 관계없이 `spotlessApply`를 실행하고 결과를 검토한다. Git Guide의 메시지 형식과 Commitlint도 확인한다.
+
+제한된 실행 환경에서 Gradle이 `~/.gradle`의 wrapper 또는 cache lock 파일에 접근하지 못하면 캐시를 삭제하지 않는다. 해당 경로의 실행 권한을 요청한 뒤 같은 명령을 다시 실행한다. 승인된 쓰기 가능한 Gradle cache 위치를 사용해야 하는 환경에서는 `GRADLE_USER_HOME`으로 경로를 지정한다.
 
 ## Review Output
 

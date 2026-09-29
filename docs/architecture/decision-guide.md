@@ -141,6 +141,20 @@ post/
 
 Mapper는 interface가 아니라 concrete infrastructure component로 시작한다. jOOQ statement를 실행하고 결과를 use case 또는 domain이 이해하는 type으로 변환한다. jOOQ의 `RecordMapper`와 혼동하지 않도록 `*RecordMapper`를 SQL 실행 객체의 이름으로 사용하지 않는다.
 
+다음은 [`UserAccountMapper`](../../src/main/java/com/example/lab/module/user/infra/persistence/UserAccountMapper.java)가 DB write와 결과 해석을 함께 표현하는 방식이다.
+
+```java
+int updated = dsl.update(USER_ACCOUNT)
+        .set(USER_ACCOUNT.STATUS, UserAccountStatus.WITHDRAWN.name())
+        .set(USER_ACCOUNT.WITHDRAWN_AT, timestamp)
+        .where(USER_ACCOUNT.ID.eq(accountId))
+        .and(USER_ACCOUNT.STATUS.eq(UserAccountStatus.ACTIVE.name()))
+        .execute();
+return updated == 1;
+```
+
+`STATUS` 조건은 동시 변경 중에도 활성 계정만 탈퇴시키는 최종 방어선이다. Use Case는 반환값을 업무 결과로 해석한다. SQL을 `DSLContext`와 함께 Use Case로 옮기면 이 경계가 흐려진다.
+
 ### Mapper를 분리하는 기준
 
 처음에는 context의 핵심 persistence 작업을 하나의 Mapper에 둔다. 다음 조건이 실제로 생기면 capability 단위로 분리한다.
@@ -276,6 +290,18 @@ Conditional SQL WHERE
 
 `NOT NULL`, `UNIQUE`, `FOREIGN KEY`와 concurrency 제어는 Bean Validation으로 대체할 수 없으므로 DB에 유지한다. `SELECT`로 확인하고 나중에 `UPDATE`하는 check-then-act는 두 문장 사이의 경쟁을 고려해야 한다. 가능하면 constraint 또는 하나의 conditional statement로 합친다. constraint에는 운영 중 식별 가능한 이름을 붙이고 기술 예외를 업무상 실패로 변환한다.
 
+비밀번호 변경에서는 조회한 hash가 여전히 현재 값인지 write 시점에 다시 확인한다. [`UserAccountMapper.updatePassword`](../../src/main/java/com/example/lab/module/user/infra/persistence/UserAccountMapper.java)는 이 조건을 하나의 `UPDATE`에 넣는다.
+
+```sql
+UPDATE user_account
+SET password_hash = :new_hash, updated_at = :now
+WHERE id = :account_id
+  AND status = 'ACTIVE'
+  AND password_hash = :current_hash;
+```
+
+영향받은 행이 0개라면 조회 이후 상태나 비밀번호가 달라졌을 수 있다. 사전 조회만으로 변경 가능성을 확정하지 않는다.
+
 ## 9. Transaction 결정
 
 1. 함께 commit되어야 하는 DB 변경을 나열한다.
@@ -287,6 +313,18 @@ Conditional SQL WHERE
 7. 외부 side effect 전후에 관찰 가능한 상태를 기록한다.
 
 `@Transactional`만 보고 원자성을 가정하지 않는다. 참여하는 datasource와 connection, propagation, rollback 대상, flush가 있다면 그 시점까지 확인한다.
+
+[`SignUpUseCase`](../../src/main/java/com/example/lab/module/auth/usecase/SignUpUseCase.java)는 다음 순서로 account와 refresh session을 만든다.
+
+```text
+PostgreSQL transaction 시작
+  -> user account INSERT
+  -> Redis refresh session 저장
+  -> PostgreSQL commit
+  -> HTTP cookie 응답
+```
+
+Redis 저장이 실패하면 DB 변경은 rollback된다. Redis 저장 후 DB commit이 실패하면 session은 TTL까지 남을 수 있다. 이 실패 경계와 검증 방법은 [Security](../operations/security.md)와 [`SignUpUseCaseIntegrationTest`](../../src/test/java/com/example/lab/module/auth/usecase/SignUpUseCaseIntegrationTest.java)에서 확인한다.
 
 ### 외부 호출이 transaction과 만날 때
 

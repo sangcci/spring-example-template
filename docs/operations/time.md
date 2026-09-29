@@ -21,3 +21,22 @@ DB를 구성할 때 connection과 session timezone은 UTC로 맞추고, 대상 D
 만료, 상태 전이와 날짜 경계처럼 현재 시각이 업무 결과에 영향을 주는 코드는 `Instant.now()`나 `LocalDate.now()`를 직접 호출하지 않는다. 주입받은 `Clock`을 사용하고 테스트에서는 `Clock.fixed()`로 경계 시각을 고정한다.
 
 HTTP 응답 생성 시각과 로그 시각처럼 업무 판단에 참여하지 않는 기술 시각은 `Instant.now()`를 직접 사용할 수 있다.
+
+탈퇴 계정의 보관 기간을 검증할 때는 [`DeleteWithdrawnAccountsUseCaseIntegrationTest`](../../src/test/java/com/example/lab/module/user/usecase/DeleteWithdrawnAccountsUseCaseIntegrationTest.java)처럼 현재 시각을 고정하고 경계 바로 전후를 비교한다.
+
+```java
+Instant now = Instant.parse("2026-09-20T00:00:00Z");
+Instant boundary = now.minus(30, ChronoUnit.DAYS);
+Clock clock = Clock.fixed(now, ZoneOffset.UTC);
+
+userAccountMapper.withdraw(expiredAccountId, boundary);
+userAccountMapper.withdraw(retainedAccountId, boundary.plusSeconds(1));
+
+int deletedCount = new DeleteWithdrawnAccountsUseCase(userAccountMapper, clock).execute();
+
+assertThat(deletedCount).isOne();
+assertThat(userAccountMapper.findById(expiredAccountId)).isEmpty();
+assertThat(userAccountMapper.findById(retainedAccountId)).isPresent();
+```
+
+예시의 `Clock.fixed`는 테스트에서만 사용한다. 운영 시각은 [`TimeConfig`](../../src/main/java/com/example/lab/global/time/TimeConfig.java)가 제공하는 `Clock`에서 읽는다.

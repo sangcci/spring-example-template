@@ -55,6 +55,19 @@ access token은 발급 시점부터 15분 동안 유효합니다.
 
 동시에 같은 refresh token으로 갱신을 요청하더라도 하나의 요청만 성공할 수 있습니다.
 
+#### 적용 예시
+
+```text
+1. 유효한 refresh token으로 갱신을 요청합니다.
+   -> 기존 token을 소비하고 새 access token과 refresh token을 발급합니다.
+
+2. 이미 소비한 refresh token으로 다시 갱신을 요청합니다.
+   -> token 재사용으로 판단하고 같은 로그인에서 파생된 refresh session을 모두 폐기합니다.
+
+3. 같은 refresh token으로 두 요청을 동시에 보냅니다.
+   -> 하나만 성공하며 다른 요청은 같은 token으로 갱신에 성공하지 못합니다.
+```
+
 refresh token을 회전해도 refresh session의 만료 시각은 최초 로그인에서 정한 시각을 넘겨 연장하지 않습니다.
 
 ## 로그아웃

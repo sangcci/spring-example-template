@@ -15,6 +15,27 @@
 - 공통 설정을 `application.yml`에 숨겨 profile 파일을 함께 읽어야만 전체 설정을 알 수 있게 만들지 않는다.
 - 환경별로 구조가 달라져야 한다면 단순 편의를 위한 예외인지 먼저 확인하고, 실제로 다른 설정 계약이 필요할 때만 차이를 문서화한다.
 
+현재 `spring.datasource.url`은 세 profile에서 같은 경로를 사용하고 값만 달리한다.
+
+```yaml
+# application-local.yml
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/spring_example}
+
+# application-test.yml
+spring:
+  datasource:
+    url: jdbc:postgresql://invalid:5432/invalid
+
+# application-prod.yml
+spring:
+  datasource:
+    url: ${DB_URL}
+```
+
+위 값은 현재 profile 파일에서 가져왔다. 설정을 바꿀 때는 세 파일을 함께 수정한다.
+
 ## 3. 환경별 값
 
 local에서는 개발자가 별도 준비 없이 실행할 수 있는 비민감 기본값을 둘 수 있다. production의 접속 정보, secret과 배포 환경에 종속된 값은 환경변수로 받고 안전하지 않은 기본값을 두지 않는다.

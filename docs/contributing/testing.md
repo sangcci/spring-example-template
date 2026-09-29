@@ -58,6 +58,18 @@
 
 권장 검증: 실제 PostgreSQL transaction과 Redis 실패 경계를 포함한 integration test에서 실패 후 account가 남지 않는지 조회한다. 이 위험을 검증하는 현재 사례는 [`SignUpUseCaseIntegrationTest`](../../src/test/java/com/example/lab/module/auth/usecase/SignUpUseCaseIntegrationTest.java)다. 테스트의 이름만으로 rollback을 증명하지 않고 최종 DB 상태를 확인한다.
 
+```java
+when(refreshSessionStore.issue(anyLong(), any(), any()))
+        .thenThrow(new DataAccessResourceFailureException("redis unavailable"));
+
+Throwable thrown = catchThrowable(() -> signUpUseCase.execute("user@example.com", "Password1!", false));
+
+assertThat(thrown).isInstanceOf(DataAccessResourceFailureException.class);
+assertThat(dsl.fetchCount(USER_ACCOUNT)).isZero();
+```
+
+이 예시는 Redis 경계의 실패를 주입하고 실제 DB에서 rollback 결과를 관찰한다. Redis protocol 자체를 검증하는 테스트는 아니다.
+
 순수한 입력 정책은 더 작은 범위가 적절하다. 예를 들어 [`EmailPolicyTest`](../../src/test/java/com/example/lab/module/user/domain/EmailPolicyTest.java)는 이메일 정규화와 거절 조건을 검증한다.
 
 ## 4. Domain과 Use Case 테스트
