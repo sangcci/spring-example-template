@@ -15,6 +15,10 @@
 
 | 작업 | 문서 | 저장소 참고 |
 | --- | --- | --- |
+| 기능 추가 | [Adding Feature](adding-feature.md) | `module/auth/usecase/SignUpUseCase.java` |
+| 버그 수정 | [Fixing Bugs](fixing-bugs.md) | `src/test/java/com/example/lab/module` |
+| 리팩터링 | [Refactoring](refactoring.md) | [Decision Guide](../architecture/decision-guide.md) |
+| 오류 경계 확인 | [Error Handling](error-handling.md) | `global/web/GlobalExceptionHandler.java`, `module/auth/infra/security` |
 | Java 구현과 표현 | [Code Style](code-style.md) | `src/main/java/com/example/lab/module` |
 | profile 설정 | [Configuration](configuration.md) | `src/main/resources/application-*.yml`, `src/test/resources/application-test.yml` |
 | 테스트 설계와 작성 | [Testing](testing.md) | `src/test/java/com/example/lab` |

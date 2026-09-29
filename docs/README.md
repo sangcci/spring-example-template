@@ -6,7 +6,7 @@
 | --- | --- | --- |
 | 설계 | [Architecture Overview](architecture/overview.md) | 실행 흐름, 경계, SQL과 transaction의 기본 원칙 |
 | 설계 판단 | [Decision Guide](architecture/decision-guide.md) | 기능별 선택 기준, 반론과 변경 조건 |
-| 개발 | [Contributing Overview](contributing/overview.md) | 코드 변경 순서와 개발 문서 지도 |
+| 개발 | [Contributing Overview](contributing/overview.md) | 기능 추가, 버그 수정, 리팩터링과 오류 처리의 읽기 경로 |
 | 업무 정책 | [Policies Overview](policies/overview.md) | owner별 업무 조건과 관찰 가능한 결과 |
 | 운영 규칙 | [Operations Overview](operations/overview.md) | 보안과 시간 표현의 기술 계약 |
 

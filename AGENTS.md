@@ -29,6 +29,9 @@ spring-example-template/
 | 작업 | 읽을 문서 |
 | --- | --- |
 | 기능 설계, 구조 변경, 코드 리뷰 | [Decision Guide](docs/architecture/decision-guide.md), 관련 [업무 정책](docs/policies/overview.md) |
+| 기능 추가 | [Adding Feature](docs/contributing/adding-feature.md), [Error Handling](docs/contributing/error-handling.md) |
+| 버그 수정 | [Fixing Bugs](docs/contributing/fixing-bugs.md), [Error Handling](docs/contributing/error-handling.md) |
+| 리팩터링 | [Refactoring](docs/contributing/refactoring.md), [Error Handling](docs/contributing/error-handling.md) |
 | Java 코드 또는 설정 변경 | [Contributing Overview](docs/contributing/overview.md), [Code Style](docs/contributing/code-style.md), 필요하면 [Configuration](docs/contributing/configuration.md) |
 | 테스트 변경 | [Testing](docs/contributing/testing.md), 관련 업무 정책 |
 | 인증 또는 시간 처리 | [Security](docs/operations/security.md), [Time](docs/operations/time.md) 중 관련 문서 |
@@ -38,6 +41,16 @@ spring-example-template/
 문서와 구현이 충돌하면 차이를 드러내고, 확정된 결정에 따라 관련 문서와 구현을 함께 갱신한다. 같은 원칙을 여러 문서에 복제하지 않는다.
 
 설계와 개발 지침은 사람과 AI가 같은 근거를 찾을 수 있도록 짧은 기준, 피할 예시와 권장 예시, 실제 코드 또는 테스트 경로, 예외 조건 순서로 쓴다. 코드와 SQL이 판단을 분명히 보여줄 수 있으면 긴 배경 설명 대신 작은 예시를 사용한다. 업무 정책서는 구현 코드보다 조건과 결과가 드러나는 사례를 사용한다.
+
+## 문서에 없는 정책을 다루는 방법
+
+문서에는 인간이 알고 있는 모든 요구사항과 결정이 담겨 있지 않다. 문서에 없는 조건을 기존 코드의 동작이나 일반적인 관례로 확정하지 않는다. 업무상 선택에 따라 사용자 결과, 권한, 데이터 보관, 동시성 또는 외부 side effect가 달라지면 사용자에게 구체적으로 질문한다.
+
+- 확인한 사실, 문서에서 찾지 못한 조건, 가능한 선택지와 각 선택의 결과를 구분해 제시한다.
+- 필요한 질문은 구현 전에 묶어서 묻되, 관련 코드 조사와 독립적인 작업은 계속 진행한다.
+- 답을 기다리는 동안 임의의 정책을 확정하거나 테스트에 고정하지 않는다.
+- 구현 선택만 남았고 기존 원칙으로 판단할 수 있다면 직접 결정하고 근거를 설명한다.
+- 사용자의 답으로 정책이 확정되면 관련 정책서, 구현과 테스트를 같은 변경에서 갱신한다.
 
 ## Workflow
 
