@@ -6,6 +6,8 @@
 
 정책서에는 업무 규칙을 작성한다. table, field, Java type, JWT claim, Redis key와 framework 설정 같은 구현 세부 사항은 architecture, security policy, API 문서 또는 코드에서 관리한다. 선택의 이유와 trade-off는 관련 기술 문서에서 설명한다.
 
+현재 정책서의 형식은 [User Policy](../policies/user.md)와 [Authentication Policy](../policies/authentication.md)를 참고한다. 정책에 예시를 추가할 때도 현재 확정된 조건과 결과를 설명하고, 구현 세부 사항으로 새 업무 규칙을 추측하지 않는다.
+
 ## 2. 문서 구조
 
 정책서의 대분류는 화면, API 또는 세부 기능이 아니라 업무 영역을 기준으로 나눈다. 관련 정책은 같은 업무 영역 아래에 모으고, 본문은 목차와 같은 순서로 배치한다.
@@ -96,7 +98,7 @@
 
 - 업무 조건과 사용자가 관찰하는 결과는 정책서에 작성한다.
 - API의 request, response, HTTP status와 field 계약은 API 문서에 작성한다.
-- security protocol, token 검증, cookie와 암호화 기준은 `docs/security-policy.md`에 작성한다.
+- security protocol, token 검증, cookie와 암호화 기준은 [Security Policy](../operations/security.md)에 작성한다.
 - architecture 선택의 맥락, 대안과 철회 조건은 관련 아키텍처 문서에 작성한다.
 - 같은 내용을 여러 문서에 복제하지 않고 source of truth를 링크한다.
 

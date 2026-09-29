@@ -388,7 +388,7 @@ module/<context>/usecase port
 
 ## 15. 테스트 전략
 
-테스트의 검증 대상, 실행 범위, 목적과 작성 형식은 [Test Guide](test-guide.md)를 따른다.
+테스트의 검증 대상, 실행 범위, 목적과 작성 형식은 [Test Guide](../contributing/testing.md)를 따른다.
 
 API 문서는 Spring REST Docs 테스트 결과를 source of truth로 사용한다. 같은 테스트에서 `restdocs-api-spec`용 snippet을 생성해 OpenAPI 명세로 변환하고, Swagger UI는 이 명세만 읽는다. production controller에 문서 생성을 위한 annotation을 추가하거나 별도의 OpenAPI 명세를 함께 관리하지 않는다.
 

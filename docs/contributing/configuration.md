@@ -8,6 +8,8 @@
 
 `application-local.yml`, `application-test.yml`, `application-prod.yml`은 같은 key, 계층과 배치 순서를 유지한다. 환경에 따라 달라지는 것은 값뿐이다.
 
+실제 profile 파일은 [`local`](../../src/main/resources/application-local.yml), [`test`](../../src/test/resources/application-test.yml), [`prod`](../../src/main/resources/application-prod.yml)에서 비교한다. 설정 key를 바꿀 때는 세 파일의 같은 위치를 함께 검토한다.
+
 - 설정 key를 추가하거나 제거하면 모든 `application-*.yml`을 같은 변경 단위에서 수정한다.
 - 특정 profile에서 사용하지 않거나 runtime에 덮어쓰는 값도 key를 생략하지 않는다.
 - 공통 설정을 `application.yml`에 숨겨 profile 파일을 함께 읽어야만 전체 설정을 알 수 있게 만들지 않는다.

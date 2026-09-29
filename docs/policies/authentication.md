@@ -21,7 +21,7 @@
 
 등록된 이메일과 비밀번호가 일치하고 활성 상태인 사용자만 로그인할 수 있습니다.
 
-로그인에 성공하면 사용자의 인증 상태를 나타내는 단기 access token과 인증을 갱신할 수 있는 refresh token을 발급합니다. token 전달과 검증의 기술 기준은 [Security Policy](../security-policy.md)를 따릅니다.
+로그인에 성공하면 사용자의 인증 상태를 나타내는 단기 access token과 인증을 갱신할 수 있는 refresh token을 발급합니다. token 전달과 검증의 기술 기준은 [Security Policy](../operations/security.md)를 따릅니다.
 
 ### 인증 실패
 

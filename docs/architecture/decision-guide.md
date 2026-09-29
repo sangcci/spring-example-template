@@ -2,7 +2,7 @@
 
 ## 1. 이 문서를 사용하는 방법
 
-이 문서는 [architecture.md](architecture.md)의 원칙을 기능 설계, 코드 리뷰, 기존 시스템 분석에 적용하기 위한 판단 도구다. 모든 기능을 같은 형태로 만들기 위한 규칙집이 아니다. 먼저 복잡성이 어디에 있는지 찾고, 그 복잡성을 가장 직접적으로 다루는 수단을 선택한다.
+이 문서는 [Architecture Overview](overview.md)의 원칙을 기능 설계, 코드 리뷰, 기존 시스템 분석에 적용하기 위한 판단 도구다. 모든 기능을 같은 형태로 만들기 위한 규칙집이 아니다. 먼저 복잡성이 어디에 있는지 찾고, 그 복잡성을 가장 직접적으로 다루는 수단을 선택한다.
 
 > 복잡성이 존재하는 곳에만 모델을 만든다.
 
@@ -22,6 +22,10 @@
 context 전체를 하나의 유형으로 단정하지 않는다. 설계 전에 Industry/Protocol, Business Policy, Data Consistency, Orchestration 복잡성을 각각 식별하고, 위치마다 다른 수단을 선택한다.
 
 ## 3. 기능 설계 순서
+
+예를 들어 회원가입을 변경할 때는 HTTP 요청에서 시작해 user account INSERT, auth refresh session 저장, PostgreSQL commit과 cookie 응답까지 순서대로 적는다. 이 흐름의 실제 진입점은 [`SignUpUseCase`](../../src/main/java/com/example/lab/module/auth/usecase/SignUpUseCase.java)이고, 실패 후 DB 상태는 [`SignUpUseCaseIntegrationTest`](../../src/test/java/com/example/lab/module/auth/usecase/SignUpUseCaseIntegrationTest.java)에서 확인한다. 이 사례의 Redis 실패 기준은 [Security](../operations/security.md)가 소유한다.
+
+피할 설계는 `save()` 호출 여부만 보고 회원가입의 원자성을 주장하는 것이다. 검토할 결과는 실패 후 account가 남는지, 응답 cookie가 발급되는지, refresh session이 어떤 상태로 남는지다.
 
 1. 사용자의 의도를 하나의 use case 이름으로 표현한다.
 2. 기능과 데이터의 owning context를 정한다.
@@ -367,7 +371,7 @@ OAuth, OIDC, JWT, PKCE, signature, password hashing과 cryptography는 직접 �
 
 ## 15. 테스트 선택
 
-검증할 위험, 함께 실행할 범위와 테스트의 목적을 분리해 판단한다. 구체적인 선택 기준과 작성 형식은 [Test Guide](test-guide.md)를 따른다.
+검증할 위험, 함께 실행할 범위와 테스트의 목적을 분리해 판단한다. 구체적인 선택 기준과 작성 형식은 [Test Guide](../contributing/testing.md)를 따른다.
 
 ## 16. 코드 리뷰 체크리스트
 
@@ -419,11 +423,11 @@ OAuth, OIDC, JWT, PKCE, signature, password hashing과 cryptography는 직접 �
 
 ## 19. Lint 검증
 
-Java 또는 Gradle 변경 후에는 다음 task를 사용한다.
+커밋 전에는 변경 파일 종류와 관계없이 formatting을 적용한다. CI 또는 별도 형식 검사가 필요하면 검사 task를 사용한다.
 
 ```text
-./gradlew spotlessCheck
 ./gradlew spotlessApply
+./gradlew spotlessCheck
 ```
 
-CI와 review에서는 `spotlessCheck`를 기준으로 사용한다. 자동 formatting이 필요할 때만 `spotlessApply`를 실행하고 변경 결과를 다시 검토한다.
+커밋 전에는 `spotlessApply`를 항상 실행하고 변경 결과를 검토한다. CI에서는 `spotlessCheck`로 형식 위반을 검증한다.

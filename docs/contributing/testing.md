@@ -52,6 +52,14 @@
 
 운영 DB의 semantics가 검증 대상이면 Testcontainers로 운영과 같은 종류와 가능한 한 가까운 version의 DB를 사용한다. in-memory DB나 mock Mapper로 SQL correctness, constraint, isolation 또는 rollback을 증명하지 않는다.
 
+### 선택 예시: 회원가입 후 Redis 저장 실패
+
+피할 검증: mock의 `save()` 호출 횟수만 확인하고 account rollback이 일어났다고 결론 내린다.
+
+권장 검증: 실제 PostgreSQL transaction과 Redis 실패 경계를 포함한 integration test에서 실패 후 account가 남지 않는지 조회한다. 이 위험을 검증하는 현재 사례는 [`SignUpUseCaseIntegrationTest`](../../src/test/java/com/example/lab/module/auth/usecase/SignUpUseCaseIntegrationTest.java)다. 테스트의 이름만으로 rollback을 증명하지 않고 최종 DB 상태를 확인한다.
+
+순수한 입력 정책은 더 작은 범위가 적절하다. 예를 들어 [`EmailPolicyTest`](../../src/test/java/com/example/lab/module/user/domain/EmailPolicyTest.java)는 이메일 정규화와 거절 조건을 검증한다.
+
 ## 4. Domain과 Use Case 테스트
 
 ### Domain이 있는 경우
@@ -201,7 +209,7 @@ Instancio로 검증 대상과 무관한 유효한 기본값을 만들 수 있다
 
 공통 fixture는 반복을 줄이면서도 각 테스트의 선행 상태와 data flow가 보이는 범위에서만 사용한다. 테스트 기반만을 위한 공통 Fixture 계층, generic test builder, repository interface 또는 container 추상화를 미리 만들지 않는다.
 
-현재 시각이 결과에 영향을 주는 테스트는 [Time Policy](time-policy.md)의 `Clock` 기준을 따른다. API 문서 생성 테스트는 Spring REST Docs 결과를 source of truth로 사용하는 [Architecture](architecture.md)의 원칙을 따른다.
+현재 시각이 결과에 영향을 주는 테스트는 [Time Policy](../operations/time.md)의 `Clock` 기준을 따른다. API 문서 생성 테스트는 Spring REST Docs 결과를 source of truth로 사용하는 [Architecture](../architecture/overview.md)의 원칙을 따른다.
 
 ## 8. 작성 전 확인 사항
 
@@ -215,3 +223,8 @@ Instancio로 검증 대상과 무관한 유효한 기본값을 만들 수 있다
 - 테스트 이름을 사람이 검토해야 하는 지점이 남아 있는가?
 - Given, When, Then에서 중요한 입력, 실행과 관찰 결과를 바로 찾을 수 있는가?
 - 테스트만을 위해 production abstraction을 추가하지 않았는가?
+
+## 참고 자료
+
+- [Spring Boot Testing](https://docs.spring.io/spring-boot/reference/testing/): Spring context를 포함하는 테스트의 범위를 선택할 때 참고한다.
+- [Gradle Java Testing](https://docs.gradle.org/current/userguide/java_testing.html): `test` task와 특정 테스트 실행 방법을 확인할 때 참고한다.

@@ -8,6 +8,14 @@
 
 3항 연산자는 사용하지 않는다. 조건에 따라 값이 달라지면 `if` 문으로 분기를 드러낸다.
 
+### 피할 예시
+
+```java
+String field = parameterName == null ? "request" : parameterName;
+```
+
+### 권장 예시
+
 ```java
 String field = parameterName;
 if (field == null) {
@@ -16,6 +24,8 @@ if (field == null) {
 ```
 
 짧은 표현이라도 조건과 결과를 한 줄에 압축하지 않는다.
+
+실제 코드에서는 [`GlobalExceptionHandler`](../../src/main/java/com/example/lab/global/web/GlobalExceptionHandler.java)의 응답 분기와 [`EmailPolicy`](../../src/main/java/com/example/lab/module/user/domain/EmailPolicy.java)의 조건 검사를 참고한다. 표현을 바꿀 때는 각 분기에서 같은 결과를 반환하는지 확인한다.
 
 하나의 분기는 하나의 업무 결정을 표현해야 한다. 논리 연산자의 개수나 boolean 변수의 개수를 기계적으로 제한하지는 않는다. 여러 조건이 하나의 정책을 구성한다면 그 조합은 허용한다. 다만 서로 독립적으로 변경되는 정책, 예외 또는 식별자 해석을 호출 지점의 조건식에서 직접 조합하지 않는다.
 
@@ -63,6 +73,8 @@ tokenStore.save(accountId, accessToken);
 ```java
 tokenStore.save(account.getId(), new AccessToken(tokenValue, clock.instant().plus(accessTokenTtl)));
 ```
+
+두 예시의 차이는 줄 수가 아니라 `expiresAt`이 언제 계산되고 어떤 값으로 저장되는지 호출 지점에서 확인할 수 있는가에 있다.
 
 단순 literal, 상수와 이미 준비된 변수는 그대로 전달할 수 있다. 지역 변수의 이름은 계산 방법이 아니라 호출받는 값의 의미를 설명해야 한다.
 
@@ -154,4 +166,4 @@ public record RecruitmentResponse(long recruitmentId, OwnerResponse owner) {
 
 ## 10. 테스트 코드
 
-테스트의 선택, 이름, 구조와 Given, When, Then 작성 기준은 [Test Guide](test-guide.md)를 따른다. 이 문서는 production code의 표현 기준만 정의한다.
+테스트의 선택, 이름, 구조와 Given, When, Then 작성 기준은 [Test Guide](testing.md)를 따른다. 이 문서는 production code의 표현 기준만 정의한다.
