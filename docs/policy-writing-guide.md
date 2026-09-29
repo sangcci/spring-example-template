@@ -4,7 +4,7 @@
 
 이 문서는 `docs/policies/`에 업무 정책서를 작성하는 기준을 정의한다. 정책서는 화면, API와 구현이 따라야 하는 업무 조건과 결과의 source of truth다.
 
-정책서에는 업무 규칙을 작성한다. table, field, Java type, JWT claim, Redis key와 framework 설정 같은 구현 세부 사항은 architecture, security policy, API 문서 또는 코드에서 관리한다. 선택의 이유와 trade-off를 장기간 보존해야 하면 ADR을 작성한다.
+정책서에는 업무 규칙을 작성한다. table, field, Java type, JWT claim, Redis key와 framework 설정 같은 구현 세부 사항은 architecture, security policy, API 문서 또는 코드에서 관리한다. 선택의 이유와 trade-off는 관련 기술 문서에서 설명한다.
 
 ## 2. 문서 구조
 
@@ -97,7 +97,7 @@
 - 업무 조건과 사용자가 관찰하는 결과는 정책서에 작성한다.
 - API의 request, response, HTTP status와 field 계약은 API 문서에 작성한다.
 - security protocol, token 검증, cookie와 암호화 기준은 `docs/security-policy.md`에 작성한다.
-- architecture 선택의 맥락, 대안과 철회 조건은 ADR에 작성한다.
+- architecture 선택의 맥락, 대안과 철회 조건은 관련 아키텍처 문서에 작성한다.
 - 같은 내용을 여러 문서에 복제하지 않고 source of truth를 링크한다.
 
 정책과 구현이 다르면 현재 동작을 정책처럼 정당화하지 않는다. 차이를 드러내고 확정된 결정에 따라 정책 또는 구현을 함께 갱신한다. AI agent는 `논의 필요`와 문서의 빈틈을 임의의 안전장치나 업무 규칙으로 채우지 않는다.

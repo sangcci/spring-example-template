@@ -301,7 +301,7 @@ query review에서는 필요한 column, index, 결정적인 ordering과 paginati
 
 ## 11. JPA 도입 결정
 
-기본 선택은 jOOQ다. JPA를 금지하지는 않지만 다음 질문에 답하고 ADR을 작성해야 한다.
+기본 선택은 jOOQ다. JPA를 금지하지는 않지만 다음 질문에 답하고 결정된 기준을 관련 아키텍처 문서에 반영해야 한다.
 
 - 어떤 aggregate lifecycle과 object graph가 JPA로 실제로 단순해지는가?
 - jOOQ보다 줄어드는 business complexity는 무엇인가?
@@ -402,9 +402,9 @@ OAuth, OIDC, JWT, PKCE, signature, password hashing과 cryptography는 직접 �
 
 분석 결과는 framework와 pattern 목록보다 flow, ownership, invariant, transaction, failure mode를 중심으로 정리한다.
 
-## 18. ADR과 반론이 필요한 결정
+## 18. 반론과 문서 갱신이 필요한 결정
 
-다음 선택은 `docs/adr/`에 기록한다.
+다음 선택은 근거, 대안, 예상 결과, 검증 방법과 철회 조건을 검토하고 관련 아키텍처 문서에 반영한다.
 
 - bounded context 또는 data ownership 변경
 - JPA나 새로운 persistence paradigm 도입
@@ -414,8 +414,6 @@ OAuth, OIDC, JWT, PKCE, signature, password hashing과 cryptography는 직접 �
 - 중요한 외부 시스템과 retry/idempotency 정책 도입
 - 공통 abstraction 또는 framework를 전역 표준으로 채택
 - architecture 원칙의 예외를 장기간 허용
-
-ADR에는 문제, 맥락과 제약, 선택지, 결정, 예상 결과, 검증 방법과 철회 조건을 적는다.
 
 중요한 결정은 현재 원칙에 동의하는 검토만 거치지 않는다. complex Order aggregate, distributed transaction, high-throughput batch, read-heavy system, multi-module monolith, MSA migration, complex authorization 같은 조건을 대입해 별도로 반론한다. AI의 critique는 판단 자료로 사용하고, 최종 결정과 trade-off는 사람이 책임진다.
 

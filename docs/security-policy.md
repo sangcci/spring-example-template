@@ -44,6 +44,8 @@ Redis 장애 시 로그인과 refresh는 fail closed한다. 유효한 access JWT
 
 회원가입은 PostgreSQL에 account를 추가한 뒤 같은 use case의 transaction 안에서 refresh session을 Redis에 저장한다. Redis 저장이 실패하면 예외를 반환해 PostgreSQL 변경을 rollback한다. Redis 저장 후 PostgreSQL commit이 실패해 남은 refresh session에는 별도의 보상 삭제나 retry를 적용하지 않고 session TTL로 정리한다. 이 경우 token과 token hash를 제외한 session 식별자와 실패 단계를 구조화 로그로 남긴다.
 
+이 순서는 Redis 장애 시 account만 생성되는 결과를 막기 위한 선택이다. PostgreSQL commit 실패 시에는 사용되지 않은 refresh session이 TTL 동안 남을 수 있다. 고아 session이 Redis 용량에 영향을 주거나 transaction 안의 Redis 호출이 병목이 되면 보상 삭제, 짧은 pending TTL 또는 별도 workflow를 검토한다.
+
 ## 5. Browser 보안
 
 frontend와 auth API는 서로 다른 subdomain에 배포한다. access token과 refresh token은 auth API host-only `HttpOnly` cookie로 전달하며 운영 환경에서는 `Secure`를 사용한다. 두 cookie는 `SameSite=Lax`를 사용하고, auth API가 처리하는 요청에만 전송되도록 Path를 제한한다.

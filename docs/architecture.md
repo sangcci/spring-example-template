@@ -2,15 +2,15 @@
 
 ## 1. 문서의 역할
 
-이 문서는 이 저장소의 아키텍처 원칙을 정의하는 source of truth다. `AGENTS.md`, 다른 AI agent용 지침, 예제 코드와 ADR은 이 문서를 참조해야 하며, 같은 내용을 각자의 표현으로 복제하지 않는다.
+이 문서는 이 저장소의 아키텍처 원칙을 정의하는 source of truth다. `AGENTS.md`, 다른 AI agent용 지침과 예제 코드는 이 문서를 참조해야 하며, 같은 내용을 각자의 표현으로 복제하지 않는다.
 
-이 저장소는 완성된 framework나 production starter를 제공하는 것이 목적이 아니다. 실제 구현을 통해 가설을 검증하고, 발견한 문제를 ADR과 규칙에 반영하는 architecture laboratory다.
+이 저장소는 완성된 framework나 production starter를 제공하는 것이 목적이 아니다. 실제 구현을 통해 가설을 검증하고, 발견한 문제를 관련 문서의 규칙에 반영하는 architecture laboratory다.
 
 ```text
 architecture hypothesis
   -> real implementation
   -> pain point discovery
-  -> critique and ADR
+  -> critique
   -> rule refinement
   -> template improvement
 ```
@@ -300,7 +300,7 @@ Write: JPA + Domain Model
 Read:  jOOQ + SQL Projection
 ```
 
-JPA를 도입할 때는 적용 경계, transaction 공유 방식, query 전략, hidden behavior의 검증법과 철회 조건을 ADR로 기록한다. 기술 통일보다 문제 적합성을 우선하되, 선택에 따른 인지 비용은 명시적으로 부담한다.
+JPA를 도입할 때는 적용 경계, transaction 공유 방식, query 전략, hidden behavior의 검증법과 철회 조건을 검토하고 관련 아키텍처 문서에 반영한다. 기술 통일보다 문제 적합성을 우선하되, 선택에 따른 인지 비용은 명시적으로 부담한다.
 
 ## 12. External system에는 port를 선택적으로 사용한다
 
@@ -400,7 +400,6 @@ AI agent는 구현자이면서 비판자다. 구현을 생성하는 agent와 별
 AI implementation
   -> independent architecture critique
   -> human judgment
-  -> ADR
   -> architecture refinement
 ```
 

@@ -17,9 +17,8 @@
 7. [`docs/time-policy.md`](docs/time-policy.md): 업무 시간대, 저장 시각과 API 시간 표현 기준을 정의한다.
 8. [`docs/security-policy.md`](docs/security-policy.md): access JWT 인증, browser cookie와 refresh session의 보안 기준을 정의한다.
 9. 관련 [`docs/policies/`](docs/policies/): bounded context가 소유하는 업무 정책을 정의한다.
-10. 관련 ADR: 해당 결정의 맥락, trade-off와 예외를 설명한다.
 
-이 파일에는 아키텍처 원칙을 복제하지 않는다. 문서와 구현이 충돌하거나 새로운 판단이 필요하면 임의로 한쪽을 따르지 말고, 차이를 드러낸 뒤 문서 또는 ADR과 구현을 함께 갱신한다.
+이 파일에는 아키텍처 원칙을 복제하지 않는다. 문서와 구현이 충돌하거나 새로운 판단이 필요하면 임의로 한쪽을 따르지 말고, 차이를 드러낸 뒤 관련 문서와 구현을 함께 갱신한다.
 
 ## Agent Workflow
 
@@ -31,7 +30,7 @@
 6. 변경 후 주요 data flow와 transaction boundary를 설명한다.
 7. 가장 위험한 가정을 중심으로 테스트한다. SQL과 DB semantics는 가능한 한 실제 대상 DB에서 검증한다.
 8. Java 또는 Gradle 파일을 변경하면 `spotlessCheck`를 실행하고, 필요할 때 `spotlessApply`로 수정한 뒤 다시 검증한다.
-9. 기존 원칙의 예외나 장기적인 trade-off가 생기면 ADR을 작성하거나 사용자에게 제안한다.
+9. 기존 원칙의 예외나 장기적인 trade-off가 생기면 근거와 대안을 제시하고, 결정된 내용을 관련 문서에 반영한다.
 10. 커밋 요청을 받으면 `docs/git-guide.md`의 type과 한글 개조식 메시지 규칙을 따르고 Commitlint를 통과하는지 확인한다.
 
 ## Change Boundaries
