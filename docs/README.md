@@ -12,4 +12,4 @@
 
 `src/docs/asciidoc`은 Spring REST Docs가 만든 결과를 조합하는 API 문서 소스다. 업무 규칙은 `docs/policies`, API의 HTTP 계약은 REST Docs 테스트와 생성 결과에서 확인한다.
 
-문서와 구현이 다르면 실제 동작을 문서의 정답으로 간주하지 않는다. 차이를 확인한 뒤 확정된 결정에 맞춰 관련 문서와 구현을 함께 갱신한다.
+작성과 중복 관리 기준은 [Documentation Guide](contributing/documentation.md)를 따른다. 문서와 구현의 차이는 [AGENTS.md](../AGENTS.md#문서에-없는-정책)에 따라 확인한다.

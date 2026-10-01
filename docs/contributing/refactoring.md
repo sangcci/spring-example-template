@@ -1,52 +1,77 @@
 # 리팩터링
 
-리팩터링은 사용자가 관찰하는 결과를 유지하면서 코드의 탐색과 검증 비용을 줄이는 변경이다. 업무 규칙이나 HTTP 계약을 바꾼다면 기능 변경 또는 버그 수정으로 다룬다.
+## 적용 기준
 
-## 1. 현재 비용을 구체적으로 적는다
+| 작업 | 적용 기준 |
+| --- | --- |
+| 기존 레거시 기능 수정과 추가 | 해당 영역의 명명, 구조와 호출 스타일 유지 |
+| 새 도메인과 새 Use Case 생성 | 프로젝트 가이드 적용 |
+| 새 코드에서 기존 레거시 도메인 호출 | 레거시 접점의 기존 호출 방식 유지 |
+| 리팩터링 목적의 작업 | E2E 회귀 테스트 확보 후 Use Case 전체를 가이드에 따라 재작성 |
+
+기능 작업에 부분적인 컨벤션 정리와 리팩터링을 섞지 않는다. 새 코드의 레거시 호출을 위해 기존 도메인까지 재구성하지 않는다. 도메인 소유권과 호출 권한은 [Architecture](../architecture/overview.md#query와-context-간-소유권)를 따른다. 레거시 스타일 유지를 다른 Context의 직접 write 허용으로 해석하지 않는다.
+
+## 진행 순서
+
+1. 기존 Use Case의 E2E 회귀 테스트를 확보한다.
+2. 진입점부터 결과까지 비즈니스 로직 흐름을 파악한다.
+3. 불명확한 정책과 동작은 사용자와 확정한다.
+4. 객체 간 메시지, 책임과 실행 경계를 정리한다.
+5. 합의한 Use Case 전체를 프로젝트 가이드에 따라 재작성한다.
+6. 동일한 회귀 테스트로 변경 전후 결과를 검증한다.
+7. 운영 위험이 큰 경우에만 Feature Flag로 점진 전환한다.
+
+## E2E 회귀 테스트
+
+외부 진입점부터 최종 응답, 저장 상태와 외부 부수 효과까지 기존 동작을 검증한다.
+
+- 성공, 거절, 예외와 실패 후 상태
+- 권한, 상태 전이와 경계값
+- 해당 Use Case의 중복 요청과 동시성
+- 트랜잭션 commit과 rollback, 외부 호출 결과
+
+메서드 호출 횟수만 확인하는 테스트로 E2E 회귀를 대신하지 않는다. 단위 및 통합 테스트는 [Testing](testing.md)에 따라 위험한 경계를 보완한다. 테스트가 관찰하지 않은 외부 프로토콜이나 동시성을 검증했다고 보고하지 않는다.
+
+## 흐름과 경계
 
 ```text
-관찰한 문제: 서로 다른 use case를 이해하려면 같은 큰 Mapper의 무관한 SQL을 계속 지나쳐야 한다.
-근거: 검색 query와 계정 변경 SQL의 변경 이유, 테스트 범위, 실행 특성이 다르다.
-목표: 해당 capability를 찾을 때 읽어야 하는 파일과 SQL을 줄인다.
+입력 -> Presentation -> UseCase
+     -> Domain / Policy -> Persistence Mapper / SQL
+     -> DB와 외부 연동 -> 응답과 최종 상태
 ```
 
-파일 수가 많거나 코드가 길다는 사실만으로 package나 Mapper를 나누지 않는다. [Decision Guide](../architecture/decision-guide.md)의 분리 기준과 현재 변경 이력을 확인한다.
+| 확인 항목 | 기록할 내용 |
+| --- | --- |
+| 업무 흐름 | 조건, 분기, 처리 순서와 결과 |
+| 메시지 | 호출 주체와 대상, 인자, 반환값, 이벤트와 오류 |
+| 도메인 경계 | 데이터 owner, read/write와 도메인 간 호출 |
+| 트랜잭션 | 시작과 종료, lock, commit과 rollback |
+| 외부 연동 | 호출 순서, 멱등성, 재시도와 실패 후 상태 |
+| 최종 방어선 | DB 제약과 조건부 변경 |
 
-## 2. 유지할 동작을 먼저 적는다
+불명확한 내용은 [미확정 정책 처리](../../AGENTS.md#문서에-없는-정책)를 따른다. 현재 동작과 확정 정책이 다르면 차이를 먼저 확정한다. 업무 결과나 API 계약 변경은 리팩터링과 구분한다.
+
+## Use Case 전체 재작성
+
+- 합의한 Use Case의 비즈니스 로직 전체를 재작성한다. 일부 클래스나 메서드만 새 스타일로 바꾸지 않는다.
+- 관련 없는 Use Case와 공유 레거시까지 변경 범위를 넓히지 않는다.
+- 레거시 도메인 접점은 기존 호출 방식을 유지한다.
+- 구조와 책임은 [Architecture](../architecture/overview.md), Mapper, Domain Model과 Port 선택은 [Decision Guide](../architecture/decision-guide.md), 표현은 [Code Style](code-style.md)을 따른다.
+- 패키지 확장과 새 Domain abstraction의 이름은 근거와 대안을 제시하고 구현 전에 사용자와 합의한다.
+- SQL 조건, 데이터 정합성, 트랜잭션과 외부 효과의 의미를 유지한다. 쿼리 변경 시 실행 결과와 성능도 확인한다.
+- 사용하지 않는 추상화와 구현을 복제하는 테스트는 추가하지 않는다.
+
+## 운영 전환
+
+운영 데이터 정합성, 인증이나 외부 부수 효과에 위험이 큰 재작성은 Feature Flag를 사용한다. 그 외에는 도입하지 않는다.
 
 ```text
-HTTP: status, 오류 code, response body, cookie
-업무: 허용과 거절 조건, 경계 시각
-DB: 읽기와 쓰기 대상, SQL predicate, 영향받은 행 수
-실행: transaction 시작과 종료, lock 순서, 외부 호출 순서
+Feature Flag OFF -> Legacy Use Case
+Feature Flag ON  -> New Use Case
 ```
 
-예를 들어 [`UserAccountMapper.withdraw`](../../src/main/java/com/example/lab/module/user/infra/persistence/UserAccountMapper.java)의 조건은 정리 과정에서도 유지해야 한다.
-
-```java
-.where(USER_ACCOUNT.ID.eq(accountId))
-.and(USER_ACCOUNT.STATUS.eq(UserAccountStatus.ACTIVE.name()))
-```
-
-이 조건을 use case의 사전 조회로만 옮기면 경쟁 요청 사이의 최종 방어선이 사라진다. 코드 모양이 비슷해도 동작을 유지한 리팩터링이 아니다.
-
-## 3. 변경 전후의 흐름을 비교한다
-
-아래는 Mapper 분리를 검토할 때 쓰는 설명용 예시다. 현재 저장소에 `UserSearchMapper`가 있다는 뜻은 아니다.
-
-```text
-변경 전: SearchUsersUseCase -> UserAccountMapper.search -> DB
-변경 후: SearchUsersUseCase -> UserSearchMapper.search -> DB
-유지 조건: 같은 projection, filter, ordering, transaction과 권한 검사
-```
-
-분리하면 검색 SQL의 owner와 검토 범위가 분명해지는지 확인한다. 새 class가 SQL을 한 번 더 감싸기만 한다면 분리 비용이 더 크다. package 구조를 확장하거나 새 domain abstraction의 이름을 정할 때는 [AGENTS.md](../../AGENTS.md)에 따라 근거와 대안을 사용자에게 제시하고 합의한다.
-
-## 4. 동작 유지의 증거를 모은다
-
-- 변경 전 테스트가 핵심 계약을 실제로 관찰하는지 확인한다. 부족하다면 위험한 경계만 보강한다.
-- SQL이 바뀌면 조건, 정렬, lock과 영향받은 행 수를 비교한다.
-- transaction과 외부 side effect 순서가 달라졌는지 확인한다.
-- HTTP 계약이 관련되면 REST Docs와 HTTP 테스트 결과를 확인한다.
-
-[Testing](testing.md)의 범위 선택 기준을 따른다. 테스트 통과만으로 동시성이나 숨겨진 framework 동작까지 같다고 결론 내리지 않는다. 변경 후 읽기 비용이 실제로 줄었는지, 추가된 파일과 추상화의 비용도 함께 설명한다.
+- 요청마다 한 경로만 실행한다.
+- 초기에는 Legacy 경로를 유지하고 합의한 대상과 트래픽 범위부터 New 경로를 활성화한다.
+- 전환 전 두 경로의 데이터 계약, 복귀 조건과 관찰 지표를 정한다.
+- 이상이 발생하면 Flag로 Legacy 경로로 복귀한다. 이미 발생한 DB 변경과 외부 효과는 Flag 전환으로 되돌아가지 않는다.
+- 운영 검증 완료 후 합의한 시점에 Flag와 Legacy 경로를 제거한다.

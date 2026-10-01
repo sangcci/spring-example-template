@@ -1,18 +1,14 @@
 # Git Guide
 
-## 1. 문서의 역할
-
-이 문서는 변경 의도를 Git history에서 빠르게 확인할 수 있도록 커밋 단위와 메시지 형식을 정의한다. Commitlint는 형식을 검사하고, 사람과 AI agent는 이 문서에 정의된 표현 관례를 따른다.
-
-## 2. 커밋 단위
+## 커밋 단위
 
 하나의 의도가 드러나는 단위로 커밋한다. 기능, 리팩터링, 대규모 형식 변경과 의존성 갱신처럼 변경 이유가 다르면 가능한 한 별도 커밋으로 나눈다.
 
-## 3. 커밋 메시지
+## 커밋 메시지
 
 커밋 메시지는 `type: 변경 내용 요약` 형식을 사용한다. `type(scope): summary` 형식은 사용하지 않는다.
 
-변경 내용 요약은 한글 개조식으로 작성한다. `추가한다`, `수정한다` 같은 서술형 종결 대신 `추가`, `수정`처럼 작성하고, 변경 방법보다 변경 대상을 표현한다.
+요약은 한글 개조식으로 변경 대상을 적는다.
 
 ```text
 feat: 구조화된 HTTP 로깅 추가
@@ -36,9 +32,9 @@ docs: 설정 파일 작성 규칙 추가
 
 여러 type이 섞이면 변경의 주된 목적을 기준으로 선택한다. 주된 목적을 하나로 설명하기 어렵다면 커밋을 나눌 수 있는지 먼저 검토한다.
 
-## 4. Commitlint
+## Commitlint
 
-Commitlint는 허용 type, scope 미사용과 제목 존재 여부를 검사한다. 한글 개조식과 변경 대상 중심의 표현은 정규식으로 정확히 판별하기 어려우므로 문서와 review로 확인한다.
+Commitlint는 type, scope 미사용과 제목을 검사한다. 한글 개조식과 변경 대상 표현은 리뷰로 확인한다.
 
 의존성을 설치하고 저장소의 Git hook을 활성화한다.
 
@@ -47,17 +43,22 @@ npm ci
 git config --local core.hooksPath .githooks
 ```
 
-설정을 마치면 `.githooks/commit-msg`가 커밋마다 Commitlint를 실행한다. 직접 확인할 때는 다음 명령을 사용한다.
+`.githooks/commit-msg`가 커밋마다 검사한다. 수동 검사:
 
 ```bash
 printf '%s\n' 'feat: 구조화된 HTTP 로깅 추가' | npm run commitlint
 ```
 
-Git hook을 건너뛸 수 있다는 이유로 `--no-verify`를 일상적인 작업에 사용하지 않는다.
+`--no-verify`를 일상적으로 사용하지 않는다.
 
-## 5. 커밋 전 확인 사항
+## 커밋 전 확인 사항
 
-변경 파일 종류와 관계없이 `./gradlew spotlessApply`를 실행하고 적용된 변경을 검토한다.
+포맷 설정은 `lint.gradle`에 둔다. Palantir Java Format, annotation formatting, unused import 제거, trailing whitespace 제거와 파일 끝 newline을 적용한다.
+
+```bash
+./gradlew spotlessApply  # 파일 종류와 관계없이 커밋 전 실행, 적용 결과 검토
+./gradlew spotlessCheck  # CI 또는 별도 포맷 검증
+```
 
 - 하나의 변경 의도를 설명하는 커밋인가?
 - 허용된 type을 사용했는가?

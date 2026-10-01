@@ -1,10 +1,8 @@
 # Configuration Guide
 
-## 1. 문서의 역할
+각 profile은 전체 설정을 한 파일에 명시한다.
 
-이 문서는 Spring Boot 설정 파일의 구조와 환경별 값 표현 기준을 정의한다. 설정을 여러 파일에서 합성해 해석하는 비용보다 각 profile에서 실제로 사용하는 전체 설정을 한 파일에서 검토할 수 있는 것을 우선한다.
-
-## 2. Profile 설정 파일
+## Profile 설정 파일
 
 `application-local.yml`, `application-test.yml`, `application-prod.yml`은 같은 key, 계층과 배치 순서를 유지한다. 환경에 따라 달라지는 것은 값뿐이다.
 
@@ -15,7 +13,7 @@
 - 공통 설정을 `application.yml`에 숨겨 profile 파일을 함께 읽어야만 전체 설정을 알 수 있게 만들지 않는다.
 - 환경별로 구조가 달라져야 한다면 단순 편의를 위한 예외인지 먼저 확인하고, 실제로 다른 설정 계약이 필요할 때만 차이를 문서화한다.
 
-현재 `spring.datasource.url`은 세 profile에서 같은 경로를 사용하고 값만 달리한다.
+현재 `spring.datasource.url` 예시:
 
 ```yaml
 # application-local.yml
@@ -34,9 +32,7 @@ spring:
     url: ${DB_URL}
 ```
 
-위 값은 현재 profile 파일에서 가져왔다. 설정을 바꿀 때는 세 파일을 함께 수정한다.
-
-## 3. 환경별 값
+## 환경별 값
 
 local에서는 개발자가 별도 준비 없이 실행할 수 있는 비민감 기본값을 둘 수 있다. production의 접속 정보, secret과 배포 환경에 종속된 값은 환경변수로 받고 안전하지 않은 기본값을 두지 않는다.
 
@@ -59,7 +55,7 @@ logging:
       console: ${LOGGING_STRUCTURED_FORMAT:}
 ```
 
-## 4. 검토 기준
+## 검토 기준
 
 - 모든 `application-*.yml`에서 key, 계층과 순서가 일치하는가?
 - 한 profile의 설정만 읽어도 애플리케이션이 요구하는 전체 설정을 확인할 수 있는가?
