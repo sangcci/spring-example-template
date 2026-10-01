@@ -51,7 +51,7 @@ AuthController.signUp
 ```java
 try {
     long accountId = userAccountMapper.insert(normalizedEmail, passwordHash, now);
-    return new CreatedUserAccount(accountId, UserRole.USER);
+    return new CreateUserAccountResult(accountId, UserRole.USER);
 } catch (DataIntegrityViolationException exception) {
     throw new ApplicationException(UserErrorCode.EMAIL_ALREADY_REGISTERED, exception);
 }

@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 
 import com.example.lab.global.error.ApplicationException;
+import com.example.lab.module.user.error.UserErrorCode;
 import com.example.lab.module.user.infra.persistence.UserAccountMapper;
 import com.example.lab.support.IntegrationTestSupport;
 import java.time.Instant;
@@ -76,8 +77,7 @@ class CreateUserAccountUseCaseIntegrationTest extends IntegrationTestSupport {
         userAccountMapper.withdraw(withdrawnAccountId, withdrawnAt);
 
         // when
-        CreateUserAccountUseCase.CreatedUserAccount createdAccount =
-                createUserAccountUseCase.execute("user@example.com", "Password1!");
+        CreateUserAccountResult createdAccount = createUserAccountUseCase.execute("user@example.com", "Password1!");
 
         // then
         assertThat(createdAccount.accountId()).isNotEqualTo(withdrawnAccountId);

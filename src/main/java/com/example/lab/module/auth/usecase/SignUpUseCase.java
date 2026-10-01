@@ -4,6 +4,7 @@ import com.example.lab.module.auth.infra.persistence.IssuedRefreshSession;
 import com.example.lab.module.auth.infra.persistence.RefreshSessionStore;
 import com.example.lab.module.auth.infra.security.AccessTokenIssuer;
 import com.example.lab.module.auth.infra.security.AuthProperties;
+import com.example.lab.module.user.usecase.CreateUserAccountResult;
 import com.example.lab.module.user.usecase.CreateUserAccountUseCase;
 import java.time.Duration;
 import org.springframework.stereotype.Service;
@@ -33,7 +34,7 @@ public class SignUpUseCase {
 
     @Transactional
     public AuthenticationResult execute(String email, String password, boolean rememberMe) {
-        CreateUserAccountUseCase.CreatedUserAccount account = createUserAccountUseCase.execute(email, password);
+        CreateUserAccountResult account = createUserAccountUseCase.execute(email, password);
         Duration refreshTtl = authProperties.standardRefreshTtl();
         if (rememberMe) {
             refreshTtl = authProperties.rememberMeRefreshTtl();

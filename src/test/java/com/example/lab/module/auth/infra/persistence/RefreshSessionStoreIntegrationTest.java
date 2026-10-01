@@ -4,9 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 
 import com.example.lab.global.error.ApplicationException;
+import com.example.lab.module.auth.error.AuthErrorCode;
 import com.example.lab.module.auth.infra.persistence.RefreshSessionStore.RotatedRefreshSession;
 import com.example.lab.module.auth.infra.persistence.RefreshSessionStore.RotationStatus;
-import com.example.lab.module.auth.usecase.AuthErrorCode;
 import com.example.lab.module.auth.usecase.RefreshAuthenticationUseCase;
 import com.example.lab.module.user.infra.persistence.UserAccountMapper;
 import com.example.lab.support.IntegrationTestSupport;

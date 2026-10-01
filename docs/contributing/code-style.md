@@ -78,11 +78,17 @@ tokenStore.save(account.getId(), new AccessToken(tokenValue, clock.instant().plu
 
 단순 literal, 상수와 이미 준비된 변수는 그대로 전달할 수 있다. 지역 변수의 이름은 계산 방법이 아니라 호출받는 값의 의미를 설명해야 한다.
 
+### Use Case 입력 계약
+
+단순한 입력은 `execute(String email, String password)`처럼 이름과 타입이 보이는 개별 매개변수로 전달한다. 매개변수 개수만으로 입력 record를 만들지 않는다. 입력 조합이 하나의 계약으로 함께 변경되거나 재사용되어야 할 때만 이름 있는 입력 type을 둔다. 변경 실행의 입력은 `*Command`, 조회 입력은 `*Query`를 사용하고 HTTP `*Request`와 구분한다. 묶음 입력의 field도 개별 이름과 타입으로 계약을 드러내며 generic message나 `Map`으로 감추지 않는다.
+
 ## 6. 여러 값을 반환하는 type
 
 여러 값을 반환하기 위해 key 문자열과 runtime casting에 의존하는 `Map<String, Object>`, 순서로 의미를 구분하는 배열이나 의미 없는 collection을 사용하지 않는다. 반환값의 의미와 소유권이 드러나는 이름 있는 type을 사용한다.
 
-단지 한 method에서만 사용한다는 이유로 class 내부에 임시 `record`를 만들지 않는다. 여러 값이 하나의 business concept를 표현하면 domain Value Object로, use case의 실행 결과이면 use case result로, 조회 결과이면 query result 또는 projection으로 표현한다. 값들이 독립적인 책임이라면 method를 나눌 수 있는지 검토한다.
+단지 한 method에서만 사용한다는 이유로 class 내부에 임시 `record`를 만들지 않는다. 여러 값이 업무 개념 자체를 표현하면 domain 데이터 record로, 별도의 invariant를 캡슐화해야 하면 domain Value Object로, use case의 실행 결과이면 use case result로, 조회 결과이면 query result 또는 projection으로 표현한다. 값들이 독립적인 책임이라면 method를 나눌 수 있는지 검토한다.
+
+use case 실행 결과를 위한 전용 type은 `*Result` 접미사를 사용한다. 예를 들어 계정 생성 결과는 `CreateUserAccountResult`, 인증 결과는 `AuthenticationResult`다. domain 업무 데이터와 단일 값, `void` 반환에는 이 규칙을 적용하지 않는다. `UserAccount`를 반환할 수 있다면 접미사만 맞추기 위해 `UserAccountResult`로 복제하지 않는다.
 
 최상위 HTTP response DTO는 API contract를 파일 단위로 찾고 검토할 수 있도록 presentation package의 별도 파일에 `record`로 작성한다. use case result를 response body로 변환해야 한다면 response DTO가 순수한 `from` factory method를 소유할 수 있다.
 

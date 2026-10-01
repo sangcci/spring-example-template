@@ -16,6 +16,12 @@
 
 이 표는 현재 구현을 읽는 지도다. 새 오류 유형을 모든 context에 적용할 공통 계층으로 만들라는 뜻이 아니다.
 
+## 오류 코드의 위치와 계약
+
+context가 의미를 정하는 오류 코드는 `module/<context>/error`에 둔다. 현재 user 오류는 `user/error/UserErrorCode.java`, auth use case 오류는 `auth/error/AuthErrorCode.java`가 소유한다. 업무 데이터나 use case 입출력 type과 구분하고, 오류를 사용하는 domain policy, use case와 adapter가 같은 코드를 참조한다. 특정 security protocol에만 속한 오류는 현재 `auth/infra/security/SecurityErrorCode`처럼 해당 기술 경계에 유지한다. context와 무관한 공통 오류 계약은 `global/error`가 소유한다.
+
+현재 `ErrorCode`는 HTTP status, 공개 code와 메시지를 함께 갖는 애플리케이션 오류 계약이다. `error` 패키지로 이동해도 순수한 DDD domain failure가 되지는 않는다. domain 업무 데이터가 usecase 타입에 의존하게 만들지 않는다.
+
 ## 1. 입력 오류와 업무 오류를 구분한다
 
 요청 body의 유효성 오류는 HTTP 경계에서 처리한다. 업무 규칙으로 거절하는 결과는 owner의 error code를 사용한다.
@@ -42,7 +48,7 @@ return ResponseEntity.status(errorCode.status()).body(ApiErrorResponse.of(errorC
 ```java
 try {
     long accountId = userAccountMapper.insert(normalizedEmail, passwordHash, now);
-    return new CreatedUserAccount(accountId, UserRole.USER);
+    return new CreateUserAccountResult(accountId, UserRole.USER);
 } catch (DataIntegrityViolationException exception) {
     throw new ApplicationException(UserErrorCode.EMAIL_ALREADY_REGISTERED, exception);
 }

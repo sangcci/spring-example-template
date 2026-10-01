@@ -1,9 +1,10 @@
 package com.example.lab.module.auth.usecase;
 
 import com.example.lab.global.error.ApplicationException;
+import com.example.lab.module.auth.error.AuthErrorCode;
+import com.example.lab.module.user.domain.UserAccount;
+import com.example.lab.module.user.domain.UserAccountStatus;
 import com.example.lab.module.user.usecase.FindLoginAccountUseCase;
-import com.example.lab.module.user.usecase.UserAccount;
-import com.example.lab.module.user.usecase.UserAccountStatus;
 import java.util.Optional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

@@ -4,7 +4,7 @@ import com.example.lab.module.auth.infra.persistence.IssuedRefreshSession;
 import com.example.lab.module.auth.infra.persistence.RefreshSessionStore;
 import com.example.lab.module.auth.infra.security.AccessTokenIssuer;
 import com.example.lab.module.auth.infra.security.AuthProperties;
-import com.example.lab.module.user.usecase.UserRole;
+import com.example.lab.module.user.domain.UserRole;
 import java.time.Duration;
 import org.springframework.stereotype.Component;
 

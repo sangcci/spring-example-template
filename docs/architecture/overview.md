@@ -46,7 +46,7 @@ AI가 boilerplate와 반복 구현의 비용을 낮추면, 사람이 직접 코�
 - persistence는 jOOQ와 SQL-first 접근을 기본으로 한다.
 - transaction과 side effect의 순서를 코드에 드러낸다.
 - consistency는 가능한 범위에서 DB constraint와 atomic operation으로 보장한다.
-- domain model은 business invariant가 실제로 복잡할 때 도입한다.
+- 행위와 invariant를 캡슐화하는 DDD domain model은 business invariant가 실제로 복잡할 때 도입한다.
 - 통제할 수 없는 외부 시스템은 선택적인 port와 infrastructure client로 격리한다.
 - 인증과 암호화처럼 이미 해결된 문제는 표준과 검증된 library를 따른다.
 
@@ -271,7 +271,9 @@ cross-domain read는 결합 비용, 성능, 접근 권한을 검토한 뒤 허�
 
 모든 bounded context는 자신의 업무 개념, data ownership과 policy를 직접 모델링한다. 그러나 그 결과가 항상 rich domain model이어야 하는 것은 아니다. 예를 들어 Post의 공개 범위, 수정 권한, 삭제 정책과 검색 규칙은 직접 정의해야 하지만, 규칙이 단순하다면 Use Case, Policy, SQL과 constraint만으로 충분할 수 있다.
 
-domain model은 기본 folder를 채우기 위해 만들지 않는다. 다음과 같은 business complexity를 실제로 줄일 때 도입한다.
+업무 개념을 표현하는 데이터 record와 enum은 행위나 복잡한 invariant가 없어도 `domain`에 둔다. 이 위치 선택은 DDD의 Entity, Value Object 또는 Aggregate 도입을 의미하지 않는다. 업무 데이터를 담기 위해 모델에 행위를 추가하지 않는다.
+
+행위와 invariant를 캡슐화하는 DDD domain model은 기본 folder를 채우기 위해 만들지 않는다. 다음과 같은 business complexity를 실제로 줄일 때 도입한다.
 
 - 여러 business rule이 상호작용한다.
 - 허용되는 state transition이 복잡하다.
@@ -340,7 +342,8 @@ com.example.lab
 │   └── <context>
 │       ├── presentation         # web, message, scheduler 진입점
 │       ├── usecase              # 처음에는 평평하게 유지
-│       ├── domain               # 빈 구조로 제공하고 필요할 때 사용
+│       ├── domain               # 업무 데이터, 업무 규칙과 선택적인 DDD 모델
+│       ├── error                # context가 소유하는 오류 코드
 │       └── infra
 │           ├── persistence      # concrete jOOQ Mapper
 │           ├── client           # context가 소유하는 외부 연동 adapter
@@ -361,9 +364,9 @@ com.example.lab
 | Data Consistency | SQL, Constraint, Transaction |
 | Orchestration | Use Case, Workflow |
 
-`module`은 단일 Gradle module 안의 bounded context를 한곳에서 식별하기 위한 package다. Gradle multi-module을 의미하지 않는다. `presentation`에는 controller, request/response, message listener와 scheduler처럼 들어오는 protocol을 처리하는 type을 둔다. Entity, Value Object, Domain Service와 Domain Policy는 `domain`에 둔다. use case의 입력·출력과 orchestration 전용 type은 `usecase`에 둔다. `infra`에는 jOOQ, context가 소유하는 외부 연동 adapter, messaging과 security의 구체적인 기술 구현을 둔다.
+`module`은 단일 Gradle module 안의 bounded context를 한곳에서 식별하기 위한 package다. Gradle multi-module을 의미하지 않는다. `presentation`에는 controller, request/response, message listener와 scheduler처럼 들어오는 protocol을 처리하는 type을 둔다. 업무 개념을 표현하는 record와 enum, Entity, Value Object, Domain Service와 Domain Policy는 `domain`에 둔다. context 오류 코드의 위치와 계약은 [Error Handling](../contributing/error-handling.md)을 따른다. use case의 입력·출력과 orchestration 전용 type은 `usecase`에 둔다. `infra`에는 jOOQ, context가 소유하는 외부 연동 adapter, messaging과 security의 구체적인 기술 구현을 둔다.
 
-여러 값을 함께 전달한다는 이유만으로 type을 `domain`에 두지 않는다. 값들이 하나의 business concept와 invariant를 표현하면 Value Object로 모델링해 `domain`에 둔다. use case 실행 결과와 orchestration을 위한 값은 `usecase`가 소유하고, HTTP request/response와 JSON 표현 구조는 `presentation`이 소유한다. SQL 조회 결과는 사용 목적과 mapping boundary에 따라 `usecase`의 query result 또는 `infra/persistence`의 projection으로 표현한다. 외부 provider의 payload는 해당 infrastructure boundary 밖으로 전파하지 않는다.
+여러 값을 함께 전달한다는 이유만으로 type을 `domain`에 두지 않는다. `UserAccount`, `UserAccountStatus`, `UserRole`처럼 업무 개념 자체를 표현하는 데이터는 `domain`이 소유한다. use case와 Mapper는 이 업무 데이터를 직접 반환할 수 있으며 접미사를 맞추기 위한 wrapper나 동일한 필드의 result를 만들지 않는다. 값들이 하나의 business concept와 invariant를 표현하면 Value Object로 모델링해 `domain`에 둔다. use case 실행 결과와 orchestration을 위한 값은 `usecase`가 소유하고, HTTP request/response와 JSON 표현 구조는 `presentation`이 소유한다. SQL 조회 결과는 사용 목적과 mapping boundary에 따라 `usecase`의 query result 또는 `infra/persistence`의 projection으로 표현한다. 외부 provider의 payload는 해당 infrastructure boundary 밖으로 전파하지 않는다.
 
 따라서 domain Value Object, use case result, query projection과 presentation DTO는 같은 모양이더라도 서로 대체하지 않는다. protocol이나 화면 구조의 변경이 domain model을 변경하게 만들지 않고, domain model도 JSON 계층 구조나 persistence projection에 맞추어 변형하지 않는다.
 

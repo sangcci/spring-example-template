@@ -182,9 +182,11 @@ statement마다 `InsertPostSql`, `SearchPostsSql` 같은 class를 만들지 않�
 4. use case의 transaction과 orchestration은 Mapper로 이동하지 않는다.
 5. 분리한 Mapper마다 실제 DB integration test와 필요한 execution plan 검증을 둔다.
 
-## 7. Domain Model 도입 결정
+## 7. 업무 데이터와 DDD Domain Model 도입 결정
 
-다음 질문에 여러 개가 명확하게 참이면 domain model을 고려한다.
+업무 데이터 record와 enum의 위치는 [Architecture Overview](overview.md#14-기본-package-방향)를 따른다. 데이터가 `domain`에 있다는 이유로 Entity나 Aggregate로 확장하지 않는다.
+
+다음 질문에 여러 개가 명확하게 참이면 행위와 invariant를 캡슐화하는 DDD domain model을 고려한다.
 
 - 여러 rule이 상호작용해 순서와 조합이 중요한가?
 - 허용되는 state transition을 한곳에서 보호해야 하는가?
@@ -197,7 +199,7 @@ statement마다 `InsertPostSql`, `SearchPostsSql` 같은 class를 만들지 않�
 
 domain model은 자신의 invariant만 소유해야 한다. 여러 context의 객체를 하나의 거대한 aggregate에 넣지 않으며, 여러 context의 조율은 use case가 담당한다.
 
-Entity, Value Object, Domain Service와 Domain Policy는 `domain`에 둔다. use case의 요청·결과와 orchestration 전용 type은 `usecase`에 둔다. 타입의 모양이 아니라 business meaning과 ownership으로 위치를 결정한다.
+업무 데이터 record와 enum, Entity, Value Object, Domain Service와 Domain Policy는 `domain`에 둔다. use case의 요청·결과와 orchestration 전용 type은 `usecase`에 둔다. 타입의 모양이 아니라 business meaning과 ownership으로 위치를 결정한다.
 
 ### 여러 값을 반환하는 type 결정
 
@@ -205,6 +207,7 @@ Entity, Value Object, Domain Service와 Domain Policy는 `domain`에 둔다. use
 
 | 함께 반환하는 값의 의미 | 표현과 위치 |
 |---|---|
+| 업무 개념 자체의 데이터 | `domain`의 record 또는 enum |
 | 하나의 business concept와 invariant | `domain`의 Value Object |
 | use case 실행 결과 또는 orchestration 전용 값 | `usecase`의 result type |
 | HTTP request/response와 JSON 구조 | `presentation`의 DTO |
@@ -212,6 +215,8 @@ Entity, Value Object, Domain Service와 Domain Policy는 `domain`에 둔다. use
 | 외부 provider의 request/response | 해당 `infra/client` 또는 `external` boundary의 DTO |
 
 값들이 서로 독립적이고 함께 변경되거나 검증될 이유가 없다면 하나의 반환 type으로 묶기 전에 책임 있는 method로 분리할 수 있는지 검토한다. 반대로 하나의 SQL snapshot, transaction 또는 business decision으로 함께 반환되어야 한다면 호출 횟수를 늘리기 위해 억지로 method를 분리하지 않고 그 의미를 드러내는 result type을 사용한다.
+
+use case는 `UserAccount` 같은 domain 업무 데이터를 직접 반환할 수 있다. 실행 결과를 조합하는 전용 계약이 필요한 경우에만 별도 result type을 둔다.
 
 DTO를 domain Value Object로 재사용하지 않는다. JSON 계층 구조, field 이름이나 외부 contract가 바뀐다는 이유로 domain이 함께 변경되어서는 안 된다. 같은 필드를 가지더라도 소유하는 boundary와 변경 이유가 다르면 별도의 type으로 유지한다.
 

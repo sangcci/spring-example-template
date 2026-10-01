@@ -1,4 +1,4 @@
-package com.example.lab.module.user.usecase;
+package com.example.lab.module.user.domain;
 
 import java.time.Instant;
 

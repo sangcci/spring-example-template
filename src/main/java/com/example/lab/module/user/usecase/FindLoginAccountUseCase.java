@@ -1,6 +1,8 @@
 package com.example.lab.module.user.usecase;
 
 import com.example.lab.module.user.domain.EmailPolicy;
+import com.example.lab.module.user.domain.UserAccount;
+import com.example.lab.module.user.domain.UserAccountStatus;
 import com.example.lab.module.user.infra.persistence.UserAccountMapper;
 import java.time.Clock;
 import java.time.Instant;

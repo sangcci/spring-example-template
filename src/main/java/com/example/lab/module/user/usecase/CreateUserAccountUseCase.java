@@ -3,6 +3,8 @@ package com.example.lab.module.user.usecase;
 import com.example.lab.global.error.ApplicationException;
 import com.example.lab.module.user.domain.EmailPolicy;
 import com.example.lab.module.user.domain.PasswordPolicy;
+import com.example.lab.module.user.domain.UserRole;
+import com.example.lab.module.user.error.UserErrorCode;
 import com.example.lab.module.user.infra.persistence.UserAccountMapper;
 import java.time.Clock;
 import java.time.Instant;
@@ -37,7 +39,7 @@ public class CreateUserAccountUseCase {
     }
 
     @Transactional
-    public CreatedUserAccount execute(String email, String password) {
+    public CreateUserAccountResult execute(String email, String password) {
         String normalizedEmail = emailPolicy.normalize(email);
         boolean validEmail = emailPolicy.isValid(normalizedEmail);
         if (!validEmail) {
@@ -62,11 +64,9 @@ public class CreateUserAccountUseCase {
         String passwordHash = passwordEncoder.encode(password);
         try {
             long accountId = userAccountMapper.insert(normalizedEmail, passwordHash, now);
-            return new CreatedUserAccount(accountId, UserRole.USER);
+            return new CreateUserAccountResult(accountId, UserRole.USER);
         } catch (DataIntegrityViolationException exception) {
             throw new ApplicationException(UserErrorCode.EMAIL_ALREADY_REGISTERED, exception);
         }
     }
-
-    public record CreatedUserAccount(long accountId, UserRole role) {}
 }

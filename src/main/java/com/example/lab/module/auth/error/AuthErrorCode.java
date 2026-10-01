@@ -1,4 +1,4 @@
-package com.example.lab.module.auth.usecase;
+package com.example.lab.module.auth.error;
 
 import com.example.lab.global.error.ErrorCode;
 

@@ -2,9 +2,9 @@ package com.example.lab.module.user.infra.persistence;
 
 import static com.example.lab.generated.jooq.tables.UserAccount.USER_ACCOUNT;
 
-import com.example.lab.module.user.usecase.UserAccount;
-import com.example.lab.module.user.usecase.UserAccountStatus;
-import com.example.lab.module.user.usecase.UserRole;
+import com.example.lab.module.user.domain.UserAccount;
+import com.example.lab.module.user.domain.UserAccountStatus;
+import com.example.lab.module.user.domain.UserRole;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;

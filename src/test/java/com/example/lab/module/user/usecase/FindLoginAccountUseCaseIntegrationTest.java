@@ -3,6 +3,8 @@ package com.example.lab.module.user.usecase;
 import static com.example.lab.generated.jooq.tables.UserAccount.USER_ACCOUNT;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.example.lab.module.user.domain.UserAccount;
+import com.example.lab.module.user.domain.UserAccountStatus;
 import com.example.lab.module.user.infra.persistence.UserAccountMapper;
 import com.example.lab.support.IntegrationTestSupport;
 import java.time.Instant;

@@ -2,9 +2,9 @@ package com.example.lab.module.auth.presentation;
 
 import com.example.lab.global.error.ApplicationException;
 import com.example.lab.global.web.ApiSuccessResponse;
+import com.example.lab.module.auth.error.AuthErrorCode;
 import com.example.lab.module.auth.infra.security.AuthCookieFactory;
 import com.example.lab.module.auth.infra.security.AuthProperties;
-import com.example.lab.module.auth.usecase.AuthErrorCode;
 import com.example.lab.module.auth.usecase.AuthenticationResult;
 import com.example.lab.module.auth.usecase.LoginUseCase;
 import com.example.lab.module.auth.usecase.LogoutUseCase;
